@@ -16,8 +16,10 @@ function Navbar() {
       <nav className="nav-links">
         <NavLink to="/">Home</NavLink>
         <NavLink to="/shop">Shop</NavLink>
-        <a href="/#repair">Repair</a>
+        <NavLink to="/repair">Repair</NavLink>
         <a href="/#contact">Contact</a>
+        {user && <NavLink to="/orders">Orders</NavLink>}
+
       </nav>
 
       <div className="nav-actions">

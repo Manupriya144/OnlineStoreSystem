@@ -1,0 +1,109 @@
+.repair-page {
+  min-height: calc(100vh - 76px);
+  padding: 50px 6% 90px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 106, 0, 0.14), transparent 32%),
+    var(--bg-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.repair-card {
+  width: 100%;
+  max-width: 760px;
+  background: linear-gradient(145deg, #171717, #0f0f0f);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  padding: 38px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+}
+
+.repair-card h1 {
+  font-size: clamp(32px, 5vw, 48px);
+  margin-bottom: 10px;
+}
+
+.repair-card > p {
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 30px;
+}
+
+.repair-card form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.repair-card input,
+.repair-card textarea {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: #0b0b0b;
+  color: white;
+  padding: 0 16px;
+  outline: none;
+  font-size: 15px;
+}
+
+.repair-card textarea {
+  grid-column: span 2;
+  min-height: 130px;
+  padding: 16px;
+  resize: vertical;
+}
+
+.repair-card input:focus,
+.repair-card textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.12);
+}
+
+.repair-msg {
+  grid-column: span 2;
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.repair-card button {
+  grid-column: span 2;
+  height: 56px;
+  border-radius: 18px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.repair-card button:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+}
+
+.repair-card button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 700px) {
+  .repair-card {
+    padding: 26px;
+  }
+
+  .repair-card form {
+    grid-template-columns: 1fr;
+  }
+
+  .repair-card textarea,
+  .repair-msg,
+  .repair-card button {
+    grid-column: span 1;
+  }
+}

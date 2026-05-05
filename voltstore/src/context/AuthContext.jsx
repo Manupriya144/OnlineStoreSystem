@@ -27,21 +27,30 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
+  async function ensureProfile(user, fullName = "") {
+    if (!user) return;
+
+    const { error } = await supabase.from("profiles").upsert({
+      id: user.id,
+      full_name: fullName || user.user_metadata?.full_name || user.email,
+      role: "customer",
+    });
+
+    if (error) throw error;
+  }
+
   async function register(email, password, fullName) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          full_name: fullName,
+        },
+      },
     });
 
     if (error) throw error;
-
-    if (data.user) {
-      await supabase.from("profiles").upsert({
-        id: data.user.id,
-        full_name: fullName,
-        role: "customer",
-      });
-    }
 
     return data;
   }
@@ -53,6 +62,8 @@ export function AuthProvider({ children }) {
     });
 
     if (error) throw error;
+
+    await ensureProfile(data.user);
 
     return data;
   }

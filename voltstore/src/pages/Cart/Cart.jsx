@@ -16,6 +16,18 @@ function Cart() {
     removeFromCart,
   } = useCart();
 
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  function handleCheckout() {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    navigate("/checkout");
+  }
+
   if (cart.length === 0) {
     return (
       <section className="cart-page">
@@ -28,17 +40,6 @@ function Cart() {
     );
   }
 
-  const navigate = useNavigate();
-  const { user } = useAuth();
-
-  function handleCheckout() {
-    if (!user) {
-      navigate("/login");
-      return;
-    }
-
-    navigate("/checkout");
-  }
 
   return (
     <section className="cart-page">

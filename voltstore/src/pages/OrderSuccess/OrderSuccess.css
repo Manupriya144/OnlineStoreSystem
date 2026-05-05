@@ -1,0 +1,88 @@
+.success-page {
+  min-height: calc(100vh - 76px);
+  padding: 60px 6%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top, rgba(255, 106, 0, 0.14), transparent 35%),
+    var(--bg-main);
+}
+
+.success-card {
+  max-width: 560px;
+  width: 100%;
+  background: linear-gradient(145deg, #171717, #0f0f0f);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  padding: 44px;
+  text-align: center;
+}
+
+.success-icon {
+  width: 78px;
+  height: 78px;
+  margin: 0 auto 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  font-size: 42px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-card h1 {
+  font-size: 34px;
+  margin-bottom: 14px;
+}
+
+.success-card p {
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.order-number {
+  margin: 28px 0;
+  padding: 18px;
+  background: #0b0b0b;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+}
+
+.order-number span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.order-number strong {
+  color: var(--accent);
+  font-size: 20px;
+}
+
+.success-actions {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.primary-action,
+.secondary-action {
+  padding: 13px 24px;
+  border-radius: 999px;
+  font-weight: 900;
+}
+
+.primary-action {
+  background: var(--accent);
+  color: white;
+}
+
+.secondary-action {
+  border: 1px solid var(--border);
+  color: white;
+}
