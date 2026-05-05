@@ -27,8 +27,11 @@ function Auth() {
         navigate("/cart");
       } else {
         await register(email, password, fullName);
-        setMessage("Account created. Please check your email if confirmation is enabled.");
-        navigate("/cart");
+
+        setMessage("Account created. Please confirm your email, then login.");
+        setMode("login");
+        setPassword("");
+        setFullName("");
       }
     } catch (error) {
       setMessage(error.message);
@@ -37,12 +40,19 @@ function Auth() {
     }
   }
 
+  function switchMode(newMode) {
+    setMode(newMode);
+    setMessage("");
+    setPassword("");
+  }
+
   return (
     <section className="auth-page">
       <div className="auth-card">
         <span className="auth-badge">Tazz Electronics</span>
 
         <h1>{mode === "login" ? "Welcome Back" : "Create Account"}</h1>
+
         <p>
           {mode === "login"
             ? "Login to continue your purchase."
@@ -101,12 +111,16 @@ function Auth() {
           {mode === "login" ? (
             <p>
               Don’t have an account?{" "}
-              <button onClick={() => setMode("register")}>Register</button>
+              <button type="button" onClick={() => switchMode("register")}>
+                Register
+              </button>
             </p>
           ) : (
             <p>
               Already have an account?{" "}
-              <button onClick={() => setMode("login")}>Login</button>
+              <button type="button" onClick={() => switchMode("login")}>
+                Login
+              </button>
             </p>
           )}
         </div>
