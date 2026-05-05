@@ -56,6 +56,20 @@
 .cart-btn {
   background: var(--accent);
   border-color: var(--accent);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+
+.cart-count {
+  background: white;
+  color: var(--accent);
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
 }
 
 .cart-btn:hover {

@@ -1,3 +1,7 @@
+
+import { useEffect, useState } from "react";
+import ProductCard from "../../components/ProductCard/ProductCard";
+import { getActiveProducts } from "../../service/productService";
 import { Link } from "react-router-dom";
 import "./Home.css";
 
@@ -26,34 +30,60 @@ const testimonialsData = [
   }
 ];
 
-const featuredProducts = [
-  {
-    id: 1,
-    name: "iPhone 13 Pro",
-    price: "Rs. 285,000",
-    image: "https://images.unsplash.com/photo-1632661674596-df8be070a5c5?q=80&w=600"
-  },
-  {
-    id: 2,
-    name: "Dell XPS 13 Laptop",
-    price: "Rs. 320,000",
-    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=600"
-  },
-  {
-    id: 3,
-    name: "Wireless Headphones",
-    price: "Rs. 18,500",
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600"
-  },
-  {
-    id: 4,
-    name: "Smart Watch",
-    price: "Rs. 45,000",
-    image: "https://images.unsplash.com/photo-1518444065439-e933c06ce9cd?q=80&w=600"
-  }
-];
+
+
+
+const categoriesData = [
+    {
+      id: 1,
+      name: "Smartphones",
+      desc: "Latest Android & iPhone devices",
+      image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=600"
+    },
+      {
+      id: 2,
+      name: "Laptops",
+      desc: "Powerful laptops for work & gaming",
+      image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=600"
+    },
+    {
+      id: 3,
+      name: "Accessories",
+      desc: "Headphones, chargers & more",
+      image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600"
+    },
+    {
+      id: 4,
+      name: "Gadgets",
+      desc: "Smart devices & tech gear",
+      image: "https://images.unsplash.com/photo-1518444065439-e933c06ce9cd?q=80&w=600"
+    },
+    {
+      id: 5,
+      name: "Repair Services",
+      desc: "Fix phones, laptops & electronics",
+      image: "https://images.unsplash.com/photo-1555617117-08d3f9b7a3c3?q=80&w=600"
+    }
+    ];
 
 function Home() {
+  const [products, setProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const data = await getActiveProducts();
+        setProducts(data.slice(0, 4));
+      } catch (error) {
+        console.log(error.message);
+      } finally {
+        setLoadingProducts(false);
+      }
+    }
+
+    loadProducts();
+  }, []);
   return (
     <>
       {/* HERO */}
@@ -99,11 +129,20 @@ function Home() {
         </div>
 
         <div className="category-grid">
-          <div className="card">📱 Smartphones</div>
-          <div className="card">💻 Laptops</div>
-          <div className="card">🎧 Accessories</div>
-          <div className="card">⌚ Gadgets</div>
-          <div className="card">🔧 Repair</div>
+          {categoriesData.map((cat) => (
+            <div className="category-card" key={cat.id}>
+              
+              <div className="category-img">
+                <img src={cat.image} alt={cat.name} />
+              </div>
+
+              <div className="category-info">
+                <h3>{cat.name}</h3>
+                <p>{cat.desc}</p>
+              </div>
+
+            </div>
+          ))}
         </div>
       </section>
 
@@ -114,24 +153,15 @@ function Home() {
           <p>Top trending items customers love</p>
         </div>
 
-        <div className="product-grid">
-          {featuredProducts.map((product) => (
-            <div className="product-card" key={product.id}>
-              
-              <div className="product-img">
-                <img src={product.image} alt={product.name} />
-              </div>
-
-              <div className="product-info">
-                <h3>{product.name}</h3>
-                <p className="price">{product.price}</p>
-
-                <button className="add-btn">Add to Cart</button>
-              </div>
-
-            </div>
-          ))}
-        </div>
+        {loadingProducts ? (
+          <p className="loading-text">Loading products...</p>
+        ) : (
+          <div className="product-grid">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* WHY */}

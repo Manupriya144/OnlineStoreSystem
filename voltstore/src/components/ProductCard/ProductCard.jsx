@@ -21,13 +21,15 @@ function ProductCard({ product }) {
       </div>
 
       <div className="product-content">
-        <p className="brand">{product.brands?.name}</p>
+        <p className="brand">{product.brands?.name || "Tazz"}</p>
         <h3>{product.name}</h3>
         <p className="short">{product.short_description}</p>
 
         <div className="product-bottom">
           <strong>{formatLKR(product.price)}</strong>
-          <span>{product.stock_qty > 0 ? "In Stock" : "Out of Stock"}</span>
+          <span className={product.stock_qty > 0 ? "in-stock" : "out-stock"}>
+            {product.stock_qty > 0 ? "In Stock" : "Out of Stock"}
+          </span>
         </div>
       </div>
     </Link>
