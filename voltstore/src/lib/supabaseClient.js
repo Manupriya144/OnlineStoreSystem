@@ -15,7 +15,7 @@ export const getProductImageUrl = (path) => {
   if (!path) return null;
 
   const { data } = supabase.storage
-    .from("products")
+    .from("product")
     .getPublicUrl(path);
 
   return data.publicUrl;
