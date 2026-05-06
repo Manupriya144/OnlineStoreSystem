@@ -164,7 +164,7 @@ export function AuthProvider({ children }) {
     setRole(null);
     setAuthLoading(false);
 
-    window.location.replace("/login");
+    window.location.replace("/");
   }
 
   return (
