@@ -693,7 +693,7 @@
 }
 
 /* ─────────────────────────────────────────
-   RESPONSIVE
+   RESPONSIVE — Tablet (≤1100px)
 ───────────────────────────────────────── */
 @media (max-width: 1100px) {
   .admin-shell {
@@ -701,19 +701,30 @@
   }
 
   .admin-sidebar {
-    position: static;
+    position: sticky;
+    top: 76px;
+    z-index: 10;
     height: auto;
     flex-direction: row;
     align-items: center;
-    padding: 16px 20px;
-    gap: 8px;
+    padding: 12px 16px;
+    gap: 6px;
     overflow-x: auto;
     flex-wrap: nowrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    border-right: none;
+    border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.07));
+  }
+
+  .admin-sidebar::-webkit-scrollbar {
+    display: none;
   }
 
   .admin-brand {
     margin-bottom: 0;
-    min-width: 180px;
+    min-width: 160px;
+    flex-shrink: 0;
   }
 
   .admin-nav-label {
@@ -721,8 +732,12 @@
   }
 
   .admin-sidebar button {
-    min-width: 130px;
+    min-width: 120px;
     flex-shrink: 0;
+    height: 38px;
+    font-size: 12px;
+    padding: 0 10px;
+    border-radius: 10px;
   }
 
   .admin-stats {
@@ -730,44 +745,276 @@
   }
 }
 
+/* ─────────────────────────────────────────
+   RESPONSIVE — Mobile (≤700px)
+───────────────────────────────────────── */
 @media (max-width: 700px) {
+  .admin-sidebar {
+    top: 76px;
+    padding: 10px 12px;
+    gap: 6px;
+  }
+
+  .admin-brand {
+    min-width: 130px;
+    gap: 8px;
+  }
+
+  .admin-brand-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 11px;
+    border-radius: 9px;
+  }
+
+  .admin-brand h2 {
+    font-size: 13px;
+  }
+
+  .admin-brand p {
+    display: none;
+  }
+
+  .admin-sidebar button {
+    min-width: 96px;
+    height: 36px;
+    font-size: 11px;
+    padding: 0 10px;
+    gap: 6px;
+    border-radius: 9px;
+  }
+
+  .admin-sidebar button .nav-icon {
+    font-size: 14px;
+    width: 16px;
+  }
+
+  /* Main content */
   .admin-main {
-    padding: 28px 5% 70px;
+    padding: 20px 4% 80px;
   }
 
+  .admin-page-header {
+    margin-bottom: 20px;
+  }
+
+  .admin-page-header h1 {
+    font-size: clamp(22px, 6vw, 28px);
+  }
+
+  .admin-page-header p {
+    font-size: 12px;
+  }
+
+  .admin-section-lbl {
+    font-size: 9px;
+    padding: 4px 12px;
+    margin-bottom: 12px;
+  }
+
+  /* Stats */
+  .admin-stats {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .admin-stat-card {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .admin-stat-card strong {
+    font-size: 26px;
+  }
+
+  .admin-stat-card span {
+    font-size: 9px;
+    margin-bottom: 6px;
+  }
+
+  /* Panel */
   .admin-panel {
-    border-radius: 20px;
+    border-radius: 18px;
   }
 
-  .panel-header,
-  .admin-product-form,
-  .panel-footer {
-    padding-left: 20px;
-    padding-right: 20px;
+  .panel-header {
+    padding: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
-  .admin-list {
-    padding: 12px;
+  .panel-header-text h2 {
+    font-size: 15px;
+  }
+
+  .panel-header-text p {
+    font-size: 11px;
+  }
+
+  .panel-header-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
+    border-radius: 11px;
+  }
+
+  /* Product form */
+  .admin-product-form {
+    padding: 16px 16px 20px;
+    gap: 12px;
   }
 
   .form-grid-2 {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
 
-  .admin-stats {
-    grid-template-columns: 1fr 1fr;
+  .form-section-title {
+    font-size: 10px;
+  }
+
+  .field label {
+    font-size: 9px;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    height: 46px;
+    font-size: 14px; /* keep readable on mobile, avoids iOS zoom */
+    border-radius: 12px;
+  }
+
+  .field textarea {
+    height: 80px;
+  }
+
+  .admin-submit-btn {
+    height: 50px;
+    font-size: 14px;
+    border-radius: 14px;
+  }
+
+  /* Product list */
+  .product-admin-list {
+    padding: 4px 10px 10px;
   }
 
   .product-admin-row {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 10px;
+    padding: 14px 12px;
+  }
+
+  .prod-name {
+    font-size: 13px;
+  }
+
+  .prod-meta {
+    font-size: 11px;
   }
 
   .product-actions {
     justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .product-actions input[type="number"] {
+    width: 64px;
+    height: 34px;
+    font-size: 12px;
+  }
+
+  .status-pill {
+    font-size: 11px;
+    padding: 6px 12px;
+  }
+
+  /* Panel footer */
+  .panel-footer {
+    padding: 12px 16px;
+  }
+
+  .panel-footer p {
+    font-size: 10px;
+  }
+
+  /* Orders / repairs cards */
+  .admin-list {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .admin-card {
+    border-radius: 14px;
   }
 
   .admin-card-top {
     flex-direction: column;
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .admin-card-top h3 {
+    font-size: 13px;
+    margin-bottom: 3px;
+  }
+
+  .admin-card-top p {
+    font-size: 11px;
+  }
+
+  .admin-card-top select {
+    width: 100%;
+    height: 42px;
+    font-size: 13px;
+  }
+
+  .admin-card-body {
+    padding: 12px 14px;
+    gap: 6px;
+  }
+
+  .admin-card-body p {
+    font-size: 12px;
+  }
+
+  .mini-items {
+    gap: 6px;
+  }
+
+  .mini-items span {
+    font-size: 10px;
+    padding: 5px 10px;
+  }
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — Extra small (≤400px)
+───────────────────────────────────────── */
+@media (max-width: 400px) {
+  .admin-brand {
+    min-width: 110px;
+  }
+
+  .admin-brand h2 {
+    font-size: 12px;
+  }
+
+  .admin-sidebar button {
+    min-width: 84px;
+    font-size: 10px;
+    padding: 0 8px;
+    gap: 4px;
+  }
+
+  .admin-stat-card strong {
+    font-size: 22px;
+  }
+
+  .admin-page-header h1 {
+    font-size: 20px;
   }
 }
