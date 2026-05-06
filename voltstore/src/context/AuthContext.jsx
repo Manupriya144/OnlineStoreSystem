@@ -5,20 +5,94 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
 
+  async function getRole(userId) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (error) {
+      console.log("Role error:", error.message);
+      setRole(null);
+      return null;
+    }
+
+    const userRole = data?.role?.trim().toLowerCase() || "customer";
+
+    console.log("ROLE DATA:", data);
+    console.log("FINAL ROLE:", userRole);
+
+    setRole(userRole);
+    return userRole;
+  }
+
+  async function ensureProfile(currentUser, fullName = "") {
+    if (!currentUser) return;
+
+    const { data: existing, error: selectError } = await supabase
+      .from("profiles")
+      .select("id, role")
+      .eq("id", currentUser.id)
+      .maybeSingle();
+
+    if (selectError) {
+      console.log("Profile select error:", selectError.message);
+      return;
+    }
+
+    // ✅ If profile exists, do NOT update role
+    if (existing) return;
+
+    // ✅ Create only if missing
+    const { error } = await supabase.from("profiles").insert({
+      id: currentUser.id,
+      full_name:
+        fullName || currentUser.user_metadata?.full_name || currentUser.email,
+      role: "customer",
+    });
+
+    if (error) {
+      console.log("Profile insert error:", error.message);
+    }
+  }
+
   useEffect(() => {
-    async function getSession() {
+    async function initAuth() {
       const { data } = await supabase.auth.getSession();
-      setUser(data.session?.user || null);
+      const currentUser = data.session?.user || null;
+
+      setUser(currentUser);
+
+      if (currentUser) {
+        await ensureProfile(currentUser);
+        await getRole(currentUser.id);
+      } else {
+        setRole(null);
+      }
+
       setAuthLoading(false);
     }
 
-    getSession();
+    initAuth();
 
     const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user || null);
+      async (_event, session) => {
+        const currentUser = session?.user || null;
+
+        setUser(currentUser);
+
+        if (currentUser) {
+          await ensureProfile(currentUser);
+          await getRole(currentUser.id);
+        } else {
+          setRole(null);
+        }
+
+        setAuthLoading(false);
       }
     );
 
@@ -26,18 +100,6 @@ export function AuthProvider({ children }) {
       listener.subscription.unsubscribe();
     };
   }, []);
-
-  async function ensureProfile(user, fullName = "") {
-    if (!user) return;
-
-    const { error } = await supabase.from("profiles").upsert({
-      id: user.id,
-      full_name: fullName || user.user_metadata?.full_name || user.email,
-      role: "customer",
-    });
-
-    if (error) throw error;
-  }
 
   async function register(email, password, fullName) {
     const { data, error } = await supabase.auth.signUp({
@@ -63,7 +125,10 @@ export function AuthProvider({ children }) {
 
     if (error) throw error;
 
-    await ensureProfile(data.user);
+    if (data.user) {
+      await ensureProfile(data.user);
+      await getRole(data.user.id);
+    }
 
     return data;
   }
@@ -71,12 +136,15 @@ export function AuthProvider({ children }) {
   async function logout() {
     await supabase.auth.signOut();
     setUser(null);
+    setRole(null);
+    window.location.href = "/login";
   }
 
   return (
     <AuthContext.Provider
       value={{
         user,
+        role,
         authLoading,
         register,
         login,

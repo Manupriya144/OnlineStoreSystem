@@ -5,7 +5,11 @@ import "./Navbar.css";
 
 function Navbar() {
   const { cartCount } = useCart();
-  const { user, logout } = useAuth();
+  const { user, role, logout, authLoading } = useAuth();
+
+  const normalizedRole = role?.trim().toLowerCase();
+
+  if (authLoading) return null;
 
   return (
     <header className="navbar">
@@ -17,9 +21,12 @@ function Navbar() {
         <NavLink to="/">Home</NavLink>
         <NavLink to="/shop">Shop</NavLink>
         <NavLink to="/repair">Repair</NavLink>
-        <a href="/#contact">Contact</a>
+
         {user && <NavLink to="/orders">Orders</NavLink>}
 
+        {normalizedRole === "admin" && (
+          <NavLink to="/admin">Admin</NavLink>
+        )}
       </nav>
 
       <div className="nav-actions">

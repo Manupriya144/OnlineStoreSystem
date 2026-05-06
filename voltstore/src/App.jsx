@@ -10,6 +10,9 @@ import Auth from "./pages/Auth/Auth";
 import OrderSuccess from "./pages/OrderSuccess/OrderSuccess";
 import Orders from "./pages/Orders/Orders";
 import Repair from "./pages/Repair/Repair";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+import AdminRoute from "./routes/AdminRoute";
+
 
 import "./App.css";
 
@@ -28,6 +31,14 @@ function App() {
           <Route path="/order-success/:orderNumber" element={<OrderSuccess />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/repair" element={<Repair />} />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            }
+          />
         </Routes>
       </main>
 
