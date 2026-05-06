@@ -15,7 +15,8 @@ function AdminDashboard() {
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [imageFile, setImageFile] = useState(null);
+
+  const [imageFiles, setImageFiles] = useState([]);
 
   const [productForm, setProductForm] = useState({
     name: "",
@@ -61,7 +62,12 @@ function AdminDashboard() {
 
     const { data: productData } = await supabase
       .from("products")
-      .select(`*, categories(name), brands(name)`)
+      .select(`
+        *,
+        categories(name),
+        brands(name),
+        product_images(id, image_path, is_primary, created_at)
+      `)
       .order("created_at", { ascending: false });
 
     const { data: categoryData } = await supabase
@@ -82,83 +88,130 @@ function AdminDashboard() {
     setLoading(false);
   }
 
-  useEffect(() => {
-    if (role === "admin") loadAdminData();
-  }, [role]);
+ useEffect(() => {
+    if (authLoading) return;
+
+    if (role === "admin") {
+      loadAdminData();
+    }
+  }, [authLoading, role]);
 
   async function updateOrderStatus(orderId, status) {
-    await supabase.from("orders").update({ order_status: status }).eq("id", orderId);
+    await supabase
+      .from("orders")
+      .update({ order_status: status })
+      .eq("id", orderId);
+
     loadAdminData();
   }
 
   async function updateRepairStatus(repairId, status) {
-    await supabase.from("repair_requests").update({ status }).eq("id", repairId);
+    await supabase
+      .from("repair_requests")
+      .update({ status })
+      .eq("id", repairId);
+
     loadAdminData();
   }
 
   async function addProduct(e) {
     e.preventDefault();
 
-    let imagePath = null;
+    const { data: productData, error: productError } = await supabase
+      .from("products")
+      .insert({
+        name: productForm.name,
+        slug: productForm.slug,
+        model: productForm.model,
+        short_description: productForm.short_description,
+        description: productForm.description,
+        price: Number(productForm.price),
+        stock_qty: Number(productForm.stock_qty),
+        sku: productForm.sku || null,
+        category_id: productForm.category_id || null,
+        brand_id: productForm.brand_id || null,
+        is_active: true,
+      })
+      .select()
+      .single();
 
-    if (imageFile) {
-      const fileExt = imageFile.name.split(".").pop();
-      const fileName = `${Date.now()}-${productForm.slug}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("product")
-        .upload(fileName, imageFile);
-
-      if (uploadError) {
-        alert(uploadError.message);
-        return;
-      }
-
-      imagePath = fileName;
-    }
-
-    const { error } = await supabase.from("products").insert({
-      name: productForm.name,
-      slug: productForm.slug,
-      model: productForm.model,
-      short_description: productForm.short_description,
-      description: productForm.description,
-      price: Number(productForm.price),
-      stock_qty: Number(productForm.stock_qty),
-      sku: productForm.sku || null,
-      category_id: productForm.category_id || null,
-      brand_id: productForm.brand_id || null,
-      image_path: imagePath,
-      is_active: true,
-    });
-
-    if (error) {
-      alert(error.message);
+    if (productError) {
+      alert(productError.message);
       return;
     }
 
-    setImageFile(null);
+    if (imageFiles.length > 0) {
+      const imageRows = [];
+
+      for (let i = 0; i < imageFiles.length; i++) {
+        const file = imageFiles[i];
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${Date.now()}-${i}-${productForm.slug}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("product")
+          .upload(fileName, file);
+
+        if (uploadError) {
+          alert(uploadError.message);
+          return;
+        }
+
+        imageRows.push({
+          product_id: productData.id,
+          image_path: fileName,
+          is_primary: i === 0,
+        });
+      }
+
+      const { error: imageInsertError } = await supabase
+        .from("product_images")
+        .insert(imageRows);
+
+      if (imageInsertError) {
+        alert(imageInsertError.message);
+        return;
+      }
+    }
+
+    setImageFiles([]);
     setProductForm({
-      name: "", slug: "", model: "", short_description: "",
-      description: "", price: "", stock_qty: "", sku: "",
-      category_id: "", brand_id: "",
+      name: "",
+      slug: "",
+      model: "",
+      short_description: "",
+      description: "",
+      price: "",
+      stock_qty: "",
+      sku: "",
+      category_id: "",
+      brand_id: "",
     });
 
     loadAdminData();
   }
 
   async function updateProductStock(productId, stockQty) {
-    await supabase.from("products").update({ stock_qty: Number(stockQty) }).eq("id", productId);
+    await supabase
+      .from("products")
+      .update({ stock_qty: Number(stockQty) })
+      .eq("id", productId);
+
     loadAdminData();
   }
 
   async function updateProductStatus(productId, isActive) {
-    await supabase.from("products").update({ is_active: isActive }).eq("id", productId);
+    await supabase
+      .from("products")
+      .update({ is_active: isActive })
+      .eq("id", productId);
+
     loadAdminData();
   }
 
   if (authLoading) return <div className="admin-loading">Checking access…</div>;
   if (!user) return <Navigate to="/login" />;
+
   if (role !== "admin") {
     return (
       <section className="admin-denied">
@@ -167,11 +220,11 @@ function AdminDashboard() {
       </section>
     );
   }
+
   if (loading) return <div className="admin-loading">Loading dashboard…</div>;
 
   return (
     <section className="admin-shell">
-      {/* ── Sidebar ── */}
       <aside className="admin-sidebar">
         <div className="admin-brand">
           <div className="admin-brand-icon">TE</div>
@@ -205,10 +258,7 @@ function AdminDashboard() {
         </button>
       </aside>
 
-      {/* ── Main ── */}
       <main className="admin-main">
-
-        {/* Page header */}
         <div className="admin-page-header">
           <span className="admin-section-lbl">Dashboard</span>
           <h1>
@@ -217,7 +267,6 @@ function AdminDashboard() {
           <p>Manage products, orders, repair requests, and store activity.</p>
         </div>
 
-        {/* Stats */}
         <div className="admin-stats">
           <div className="admin-stat-card">
             <span>Total Orders</span>
@@ -225,7 +274,9 @@ function AdminDashboard() {
           </div>
           <div className="admin-stat-card">
             <span>Pending Orders</span>
-            <strong>{orders.filter((o) => o.order_status === "pending").length}</strong>
+            <strong>
+              {orders.filter((o) => o.order_status === "pending").length}
+            </strong>
           </div>
           <div className="admin-stat-card">
             <span>Repair Requests</span>
@@ -237,13 +288,12 @@ function AdminDashboard() {
           </div>
         </div>
 
-        {/* ── Products tab ── */}
         {activeTab === "products" && (
           <div className="admin-panel">
             <div className="panel-header">
               <div className="panel-header-text">
                 <h2>Product Management</h2>
-                <p>Add new products, upload photos, and manage stock.</p>
+                <p>Add products, upload multiple photos, and manage stock.</p>
               </div>
               <div className="panel-header-icon">📦</div>
             </div>
@@ -261,6 +311,7 @@ function AdminDashboard() {
                     required
                   />
                 </div>
+
                 <div className="field">
                   <label>Slug</label>
                   <input
@@ -270,6 +321,7 @@ function AdminDashboard() {
                     required
                   />
                 </div>
+
                 <div className="field">
                   <label>Model</label>
                   <input
@@ -278,6 +330,7 @@ function AdminDashboard() {
                     onChange={(e) => updateProductField("model", e.target.value)}
                   />
                 </div>
+
                 <div className="field">
                   <label>SKU</label>
                   <input
@@ -301,13 +354,16 @@ function AdminDashboard() {
                     required
                   />
                 </div>
+
                 <div className="field">
                   <label>Stock Quantity</label>
                   <input
                     type="number"
                     placeholder="e.g. 12"
                     value={productForm.stock_qty}
-                    onChange={(e) => updateProductField("stock_qty", e.target.value)}
+                    onChange={(e) =>
+                      updateProductField("stock_qty", e.target.value)
+                    }
                     required
                   />
                 </div>
@@ -320,36 +376,47 @@ function AdminDashboard() {
                   <label>Category</label>
                   <select
                     value={productForm.category_id}
-                    onChange={(e) => updateProductField("category_id", e.target.value)}
+                    onChange={(e) =>
+                      updateProductField("category_id", e.target.value)
+                    }
                   >
                     <option value="">Select Category</option>
                     {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
                     ))}
                   </select>
                 </div>
+
                 <div className="field">
                   <label>Brand</label>
                   <select
                     value={productForm.brand_id}
-                    onChange={(e) => updateProductField("brand_id", e.target.value)}
+                    onChange={(e) =>
+                      updateProductField("brand_id", e.target.value)
+                    }
                   >
                     <option value="">Select Brand</option>
                     {brands.map((brand) => (
-                      <option key={brand.id} value={brand.id}>{brand.name}</option>
+                      <option key={brand.id} value={brand.id}>
+                        {brand.name}
+                      </option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              <span className="form-section-title">Description & Image</span>
+              <span className="form-section-title">Description & Images</span>
 
               <div className="field">
                 <label>Short Description</label>
                 <input
                   placeholder="One-line product summary"
                   value={productForm.short_description}
-                  onChange={(e) => updateProductField("short_description", e.target.value)}
+                  onChange={(e) =>
+                    updateProductField("short_description", e.target.value)
+                  }
                 />
               </div>
 
@@ -358,18 +425,27 @@ function AdminDashboard() {
                 <textarea
                   placeholder="Detailed product description…"
                   value={productForm.description}
-                  onChange={(e) => updateProductField("description", e.target.value)}
+                  onChange={(e) =>
+                    updateProductField("description", e.target.value)
+                  }
                 />
               </div>
 
               <div className="field field-file">
-                <label>Product Image</label>
+                <label>Product Images</label>
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => setImageFile(e.target.files[0])}
+                  multiple
+                  onChange={(e) => setImageFiles(Array.from(e.target.files))}
                 />
-                {imageFile && <p className="field-file-name">📎 {imageFile.name}</p>}
+
+                {imageFiles.length > 0 && (
+                  <p className="field-file-name">
+                    📎 {imageFiles.length} image(s) selected. First image will
+                    be primary.
+                  </p>
+                )}
               </div>
 
               <button type="submit" className="admin-submit-btn">
@@ -377,27 +453,37 @@ function AdminDashboard() {
               </button>
             </form>
 
-            {/* Product list */}
             <div className="product-admin-list">
               {products.map((product) => (
                 <div className="product-admin-row" key={product.id}>
                   <div>
                     <p className="prod-name">{product.name}</p>
                     <p className="prod-meta">
-                      {product.brands?.name || "No Brand"} · {product.categories?.name || "No Category"}
+                      {product.brands?.name || "No Brand"} ·{" "}
+                      {product.categories?.name || "No Category"}
                     </p>
                     <p className="prod-price">{formatLKR(product.price)}</p>
+                    <p className="prod-meta">
+                      Images: {product.product_images?.length || 0}
+                    </p>
                   </div>
 
                   <div className="product-actions">
                     <input
                       type="number"
                       defaultValue={product.stock_qty}
-                      onBlur={(e) => updateProductStock(product.id, e.target.value)}
+                      onBlur={(e) =>
+                        updateProductStock(product.id, e.target.value)
+                      }
                     />
+
                     <button
-                      className={`status-pill ${product.is_active ? "active" : "inactive"}`}
-                      onClick={() => updateProductStatus(product.id, !product.is_active)}
+                      className={`status-pill ${
+                        product.is_active ? "active" : "inactive"
+                      }`}
+                      onClick={() =>
+                        updateProductStatus(product.id, !product.is_active)
+                      }
                     >
                       {product.is_active ? "Active" : "Inactive"}
                     </button>
@@ -407,12 +493,14 @@ function AdminDashboard() {
             </div>
 
             <div className="panel-footer">
-              <p>🔒 Stock changes save on blur. Toggle visibility with the status pill.</p>
+              <p>
+                🔒 First uploaded image becomes primary. Stock changes save on
+                blur.
+              </p>
             </div>
           </div>
         )}
 
-        {/* ── Orders tab ── */}
         {activeTab === "orders" && (
           <div className="admin-panel">
             <div className="panel-header">
@@ -431,9 +519,12 @@ function AdminDashboard() {
                       <h3>{order.order_number}</h3>
                       <p>{new Date(order.created_at).toLocaleString()}</p>
                     </div>
+
                     <select
                       value={order.order_status}
-                      onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                      onChange={(e) =>
+                        updateOrderStatus(order.id, e.target.value)
+                      }
                     >
                       <option value="pending">Pending</option>
                       <option value="confirmed">Confirmed</option>
@@ -444,11 +535,20 @@ function AdminDashboard() {
                   </div>
 
                   <div className="admin-card-body">
-                    <p><b>Total:</b> {formatLKR(order.total_amount)}</p>
-                    <p><b>Payment:</b> {order.payment_status}</p>
+                    <p>
+                      <b>Total:</b> {formatLKR(order.total_amount)}
+                    </p>
+                    <p>
+                      <b>Payment:</b> {order.payment_status}
+                    </p>
+
                     {order.addresses && (
-                      <p><b>Address:</b> {order.addresses.line1}, {order.addresses.city}</p>
+                      <p>
+                        <b>Address:</b> {order.addresses.line1},{" "}
+                        {order.addresses.city}
+                      </p>
                     )}
+
                     <div className="mini-items">
                       {order.order_items?.map((item) => (
                         <span key={item.id}>
@@ -463,7 +563,6 @@ function AdminDashboard() {
           </div>
         )}
 
-        {/* ── Repairs tab ── */}
         {activeTab === "repairs" && (
           <div className="admin-panel">
             <div className="panel-header">
@@ -480,11 +579,16 @@ function AdminDashboard() {
                   <div className="admin-card-top">
                     <div>
                       <h3>{repair.device_type} Repair</h3>
-                      <p>{repair.brand} {repair.model}</p>
+                      <p>
+                        {repair.brand} {repair.model}
+                      </p>
                     </div>
+
                     <select
                       value={repair.status}
-                      onChange={(e) => updateRepairStatus(repair.id, e.target.value)}
+                      onChange={(e) =>
+                        updateRepairStatus(repair.id, e.target.value)
+                      }
                     >
                       <option value="pending">Pending</option>
                       <option value="confirmed">Confirmed</option>
@@ -495,10 +599,19 @@ function AdminDashboard() {
                   </div>
 
                   <div className="admin-card-body">
-                    <p><b>Issue:</b> {repair.issue_description}</p>
-                    <p><b>Customer:</b> {repair.contact_name}</p>
-                    <p><b>Phone:</b> {repair.contact_phone}</p>
-                    <p><b>Preferred Date:</b> {repair.preferred_date || "Not selected"}</p>
+                    <p>
+                      <b>Issue:</b> {repair.issue_description}
+                    </p>
+                    <p>
+                      <b>Customer:</b> {repair.contact_name}
+                    </p>
+                    <p>
+                      <b>Phone:</b> {repair.contact_phone}
+                    </p>
+                    <p>
+                      <b>Preferred Date:</b>{" "}
+                      {repair.preferred_date || "Not selected"}
+                    </p>
                   </div>
                 </div>
               ))}

@@ -17,6 +17,9 @@ export async function getActiveProducts() {
     throw new Error(error.message);
   }
 
+  console.log("PRODUCT DATA:", data);
+  console.log("PRODUCT ERROR:", error);
+
   return data;
 }
 

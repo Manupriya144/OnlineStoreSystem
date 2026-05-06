@@ -120,7 +120,7 @@ function Shop() {
               min="0"
               max="1000000"
               value={price}
-              onChange={(e) => setPrice(e.target.value)}
+              onChange={(e) => setPrice(Number(e.target.value))}
             />
           </div>
 
@@ -156,7 +156,7 @@ function Shop() {
               )}
             </div>
 
-            <select onChange={(e) => setSort(e.target.value)}>
+            <select value={sort} onChange={(e) => setSort(e.target.value)}>
               <option value="default">Sort</option>
               <option value="low">Price Low → High</option>
               <option value="high">Price High → Low</option>

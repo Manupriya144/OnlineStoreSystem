@@ -7,12 +7,14 @@ import "./Orders.css";
 
 function Orders() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (authLoading) return;
+
     if (!user) {
       navigate("/login");
       return;
@@ -43,9 +45,9 @@ function Orders() {
     }
 
     loadOrders();
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
-  if (loading) {
+  if (authLoading || loading) {
     return <section className="orders-page">Loading orders...</section>;
   }
 

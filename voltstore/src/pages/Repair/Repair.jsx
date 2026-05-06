@@ -48,7 +48,7 @@ const TRUST = [
 ];
 
 function Repair() {
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -71,6 +71,8 @@ function Repair() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    if (authLoading) return;
 
     if (!user) {
       navigate("/login");

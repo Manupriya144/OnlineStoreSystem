@@ -11,8 +11,9 @@ function generateOrderNumber() {
 }
 
 function Checkout() {
+
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
   const { cart, subtotal, deliveryFee, total, clearCart } = useCart();
 
   const [form, setForm] = useState({
@@ -28,6 +29,14 @@ function Checkout() {
 
   const [placing, setPlacing] = useState(false);
   const [message, setMessage] = useState("");
+  
+  if (authLoading) {
+    return (
+      <section className="checkout-page">
+        Loading checkout...
+      </section>
+    );
+  }
 
   if (!user) {
     navigate("/login");

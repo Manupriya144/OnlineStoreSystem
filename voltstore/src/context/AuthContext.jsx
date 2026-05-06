@@ -13,21 +13,17 @@ export function AuthProvider({ children }) {
       .from("profiles")
       .select("role")
       .eq("id", userId)
-      .maybeSingle();
+      .single();
 
     if (error) {
       console.log("Role error:", error.message);
-      setRole(null);
-      return null;
+      setRole("customer");
+      return "customer";
     }
 
-    const userRole = data?.role?.trim().toLowerCase() || "customer";
-
-    console.log("ROLE DATA:", data);
-    console.log("FINAL ROLE:", userRole);
-
-    setRole(userRole);
-    return userRole;
+    const finalRole = data?.role?.trim().toLowerCase() || "customer";
+    setRole(finalRole);
+    return finalRole;
   }
 
   async function ensureProfile(currentUser, fullName = "") {
@@ -35,7 +31,7 @@ export function AuthProvider({ children }) {
 
     const { data: existing, error: selectError } = await supabase
       .from("profiles")
-      .select("id, role")
+      .select("id")
       .eq("id", currentUser.id)
       .maybeSingle();
 
@@ -44,10 +40,8 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    // ✅ If profile exists, do NOT update role
     if (existing) return;
 
-    // ✅ Create only if missing
     const { error } = await supabase.from("profiles").insert({
       id: currentUser.id,
       full_name:
@@ -61,43 +55,58 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
+    let mounted = true;
+
     async function initAuth() {
-      const { data } = await supabase.auth.getSession();
+      setAuthLoading(true);
+
+      const { data, error } = await supabase.auth.getSession();
+
+      if (!mounted) return;
+
+      if (error) {
+        console.log("Session error:", error.message);
+        setUser(null);
+        setRole(null);
+        setAuthLoading(false);
+        return;
+      }
+
       const currentUser = data.session?.user || null;
 
       setUser(currentUser);
 
       if (currentUser) {
-        await ensureProfile(currentUser);
         await getRole(currentUser.id);
       } else {
         setRole(null);
       }
 
-      setAuthLoading(false);
+      if (mounted) setAuthLoading(false);
     }
 
     initAuth();
 
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        const currentUser = session?.user || null;
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const currentUser = session?.user || null;
 
-        setUser(currentUser);
+      setUser(currentUser);
 
-        if (currentUser) {
-          await ensureProfile(currentUser);
-          await getRole(currentUser.id);
-        } else {
-          setRole(null);
-        }
-
+      if (currentUser) {
+        getRole(currentUser.id).finally(() => {
+          setAuthLoading(false);
+        });
+      } else {
+        setRole(null);
         setAuthLoading(false);
       }
-    );
+    });
 
     return () => {
-      listener.subscription.unsubscribe();
+      mounted = false;
+      subscription.unsubscribe();
     };
   }, []);
 
@@ -114,30 +123,48 @@ export function AuthProvider({ children }) {
 
     if (error) throw error;
 
-    return data;
-  }
-
-  async function login(email, password) {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) throw error;
-
     if (data.user) {
-      await ensureProfile(data.user);
-      await getRole(data.user.id);
+      await ensureProfile(data.user, fullName);
     }
 
     return data;
   }
 
+  async function login(email, password) {
+    setAuthLoading(true);
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      setAuthLoading(false);
+      throw error;
+    }
+
+    if (data.user) {
+      await ensureProfile(data.user);
+      setUser(data.user);
+      await getRole(data.user.id);
+    }
+
+    setAuthLoading(false);
+    return data;
+  }
+
   async function logout() {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.log("Logout error:", error.message);
+    }
+
     setUser(null);
     setRole(null);
-    window.location.href = "/login";
+    setAuthLoading(false);
+
+    window.location.replace("/login");
   }
 
   return (

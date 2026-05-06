@@ -7,9 +7,7 @@ function Navbar() {
   const { cartCount } = useCart();
   const { user, role, logout, authLoading } = useAuth();
 
-  const normalizedRole = role?.trim().toLowerCase();
-
-  if (authLoading) return null;
+  const normalizedRole = role ? role.trim().toLowerCase() : "";
 
   return (
     <header className="navbar">
@@ -22,15 +20,17 @@ function Navbar() {
         <NavLink to="/shop">Shop</NavLink>
         <NavLink to="/repair">Repair</NavLink>
 
-        {user && <NavLink to="/orders">Orders</NavLink>}
+        {!authLoading && user && <NavLink to="/orders">Orders</NavLink>}
 
-        {normalizedRole === "admin" && (
+        {!authLoading && normalizedRole === "admin" && (
           <NavLink to="/admin">Admin</NavLink>
         )}
       </nav>
 
       <div className="nav-actions">
-        {user ? (
+        {authLoading ? (
+          <span className="login-btn">Loading...</span>
+        ) : user ? (
           <button className="login-btn" onClick={logout}>
             Logout
           </button>

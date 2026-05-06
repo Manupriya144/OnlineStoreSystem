@@ -20,8 +20,13 @@ function ProductDetails() {
     async function loadProduct() {
       try {
         setLoading(true);
-
         const data = await getProductBySlug(slug);
+
+        if (!data) {
+          setProduct(null);
+          return;
+        }
+
         setProduct(data);
 
         const primary =

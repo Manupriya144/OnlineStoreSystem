@@ -17,9 +17,11 @@ function Cart() {
   } = useCart();
 
   const navigate = useNavigate();
-  const { user } = useAuth();
-
+  const { user, authLoading } = useAuth();
   function handleCheckout() {
+
+    if (authLoading) return;
+
     if (!user) {
       navigate("/login");
       return;
@@ -83,7 +85,7 @@ function Cart() {
                 <div className="qty-control">
                   <button
                     onClick={() =>
-                      updateQuantity(item.product.id, item.quantity - 1)
+                      updateQuantity(item.product.id, Math.max(1, item.quantity - 1))
                     }
                   >
                     −
