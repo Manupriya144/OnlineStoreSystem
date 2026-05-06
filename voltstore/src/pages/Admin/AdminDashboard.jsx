@@ -83,26 +83,16 @@ function AdminDashboard() {
   }
 
   useEffect(() => {
-    if (role === "admin") {
-      loadAdminData();
-    }
+    if (role === "admin") loadAdminData();
   }, [role]);
 
   async function updateOrderStatus(orderId, status) {
-    await supabase
-      .from("orders")
-      .update({ order_status: status })
-      .eq("id", orderId);
-
+    await supabase.from("orders").update({ order_status: status }).eq("id", orderId);
     loadAdminData();
   }
 
   async function updateRepairStatus(repairId, status) {
-    await supabase
-      .from("repair_requests")
-      .update({ status })
-      .eq("id", repairId);
-
+    await supabase.from("repair_requests").update({ status }).eq("id", repairId);
     loadAdminData();
   }
 
@@ -148,45 +138,27 @@ function AdminDashboard() {
     }
 
     setImageFile(null);
-
     setProductForm({
-      name: "",
-      slug: "",
-      model: "",
-      short_description: "",
-      description: "",
-      price: "",
-      stock_qty: "",
-      sku: "",
-      category_id: "",
-      brand_id: "",
+      name: "", slug: "", model: "", short_description: "",
+      description: "", price: "", stock_qty: "", sku: "",
+      category_id: "", brand_id: "",
     });
 
     loadAdminData();
   }
 
   async function updateProductStock(productId, stockQty) {
-    await supabase
-      .from("products")
-      .update({ stock_qty: Number(stockQty) })
-      .eq("id", productId);
-
+    await supabase.from("products").update({ stock_qty: Number(stockQty) }).eq("id", productId);
     loadAdminData();
   }
 
   async function updateProductStatus(productId, isActive) {
-    await supabase
-      .from("products")
-      .update({ is_active: isActive })
-      .eq("id", productId);
-
+    await supabase.from("products").update({ is_active: isActive }).eq("id", productId);
     loadAdminData();
   }
 
-  if (authLoading) return <div className="admin-loading">Checking access...</div>;
-
+  if (authLoading) return <div className="admin-loading">Checking access…</div>;
   if (!user) return <Navigate to="/login" />;
-
   if (role !== "admin") {
     return (
       <section className="admin-denied">
@@ -195,184 +167,226 @@ function AdminDashboard() {
       </section>
     );
   }
-
-  if (loading) return <div className="admin-loading">Loading admin dashboard...</div>;
+  if (loading) return <div className="admin-loading">Loading dashboard…</div>;
 
   return (
     <section className="admin-shell">
+      {/* ── Sidebar ── */}
       <aside className="admin-sidebar">
         <div className="admin-brand">
-          <span>TE</span>
+          <div className="admin-brand-icon">TE</div>
           <div>
             <h2>Tazz Admin</h2>
             <p>Control Center</p>
           </div>
         </div>
 
+        <span className="admin-nav-label">Manage</span>
+
         <button
           className={activeTab === "products" ? "active" : ""}
           onClick={() => setActiveTab("products")}
         >
-          📦 Products
+          <span className="nav-icon">📦</span> Products
         </button>
 
         <button
           className={activeTab === "orders" ? "active" : ""}
           onClick={() => setActiveTab("orders")}
         >
-          🧾 Orders
+          <span className="nav-icon">🧾</span> Orders
         </button>
 
         <button
           className={activeTab === "repairs" ? "active" : ""}
           onClick={() => setActiveTab("repairs")}
         >
-          🛠 Repairs
+          <span className="nav-icon">🛠</span> Repairs
         </button>
       </aside>
 
+      {/* ── Main ── */}
       <main className="admin-main">
-        <div className="admin-hero">
-          <div>
-            <span className="admin-badge">Dashboard</span>
-            <h1>Admin Control Center</h1>
-            <p>Manage products, orders, repair requests, and store activity.</p>
-          </div>
+
+        {/* Page header */}
+        <div className="admin-page-header">
+          <span className="admin-section-lbl">Dashboard</span>
+          <h1>
+            Admin <em>Control</em> Center
+          </h1>
+          <p>Manage products, orders, repair requests, and store activity.</p>
         </div>
 
+        {/* Stats */}
         <div className="admin-stats">
-          <div>
+          <div className="admin-stat-card">
             <span>Total Orders</span>
             <strong>{orders.length}</strong>
           </div>
-
-          <div>
+          <div className="admin-stat-card">
             <span>Pending Orders</span>
             <strong>{orders.filter((o) => o.order_status === "pending").length}</strong>
           </div>
-
-          <div>
+          <div className="admin-stat-card">
             <span>Repair Requests</span>
             <strong>{repairs.length}</strong>
           </div>
-
-          <div>
+          <div className="admin-stat-card">
             <span>Total Products</span>
             <strong>{products.length}</strong>
           </div>
         </div>
 
+        {/* ── Products tab ── */}
         {activeTab === "products" && (
           <div className="admin-panel">
-            <div className="panel-title">
-              <h2>Product Management</h2>
-              <p>Add new products, upload product photos, and manage stock.</p>
+            <div className="panel-header">
+              <div className="panel-header-text">
+                <h2>Product Management</h2>
+                <p>Add new products, upload photos, and manage stock.</p>
+              </div>
+              <div className="panel-header-icon">📦</div>
             </div>
 
             <form className="admin-product-form" onSubmit={addProduct}>
-              <input
-                placeholder="Product name"
-                value={productForm.name}
-                onChange={(e) => updateProductField("name", e.target.value)}
-                required
-              />
+              <span className="form-section-title">Product Info</span>
 
-              <input
-                placeholder="Slug"
-                value={productForm.slug}
-                onChange={(e) => updateProductField("slug", e.target.value)}
-                required
-              />
+              <div className="form-grid-2">
+                <div className="field">
+                  <label>Product Name</label>
+                  <input
+                    placeholder="e.g. iPhone 15 Pro Max"
+                    value={productForm.name}
+                    onChange={(e) => updateProductField("name", e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="field">
+                  <label>Slug</label>
+                  <input
+                    placeholder="auto-generated"
+                    value={productForm.slug}
+                    onChange={(e) => updateProductField("slug", e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="field">
+                  <label>Model</label>
+                  <input
+                    placeholder="e.g. A2849"
+                    value={productForm.model}
+                    onChange={(e) => updateProductField("model", e.target.value)}
+                  />
+                </div>
+                <div className="field">
+                  <label>SKU</label>
+                  <input
+                    placeholder="e.g. APL-IP15PM-256"
+                    value={productForm.sku}
+                    onChange={(e) => updateProductField("sku", e.target.value)}
+                  />
+                </div>
+              </div>
 
-              <input
-                placeholder="Model"
-                value={productForm.model}
-                onChange={(e) => updateProductField("model", e.target.value)}
-              />
+              <span className="form-section-title">Pricing & Stock</span>
 
-              <input
-                placeholder="SKU"
-                value={productForm.sku}
-                onChange={(e) => updateProductField("sku", e.target.value)}
-              />
+              <div className="form-grid-2">
+                <div className="field">
+                  <label>Price (LKR)</label>
+                  <input
+                    type="number"
+                    placeholder="e.g. 299900"
+                    value={productForm.price}
+                    onChange={(e) => updateProductField("price", e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="field">
+                  <label>Stock Quantity</label>
+                  <input
+                    type="number"
+                    placeholder="e.g. 12"
+                    value={productForm.stock_qty}
+                    onChange={(e) => updateProductField("stock_qty", e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
 
-              <input
-                type="number"
-                placeholder="Price"
-                value={productForm.price}
-                onChange={(e) => updateProductField("price", e.target.value)}
-                required
-              />
+              <span className="form-section-title">Category & Brand</span>
 
-              <input
-                type="number"
-                placeholder="Stock quantity"
-                value={productForm.stock_qty}
-                onChange={(e) => updateProductField("stock_qty", e.target.value)}
-                required
-              />
+              <div className="form-grid-2">
+                <div className="field">
+                  <label>Category</label>
+                  <select
+                    value={productForm.category_id}
+                    onChange={(e) => updateProductField("category_id", e.target.value)}
+                  >
+                    <option value="">Select Category</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="field">
+                  <label>Brand</label>
+                  <select
+                    value={productForm.brand_id}
+                    onChange={(e) => updateProductField("brand_id", e.target.value)}
+                  >
+                    <option value="">Select Brand</option>
+                    {brands.map((brand) => (
+                      <option key={brand.id} value={brand.id}>{brand.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
 
-              <div className="file-upload span-2">
+              <span className="form-section-title">Description & Image</span>
+
+              <div className="field">
+                <label>Short Description</label>
+                <input
+                  placeholder="One-line product summary"
+                  value={productForm.short_description}
+                  onChange={(e) => updateProductField("short_description", e.target.value)}
+                />
+              </div>
+
+              <div className="field">
+                <label>Full Description</label>
+                <textarea
+                  placeholder="Detailed product description…"
+                  value={productForm.description}
+                  onChange={(e) => updateProductField("description", e.target.value)}
+                />
+              </div>
+
+              <div className="field field-file">
                 <label>Product Image</label>
                 <input
                   type="file"
                   accept="image/*"
                   onChange={(e) => setImageFile(e.target.files[0])}
                 />
-                {imageFile && <p>{imageFile.name}</p>}
+                {imageFile && <p className="field-file-name">📎 {imageFile.name}</p>}
               </div>
 
-              <select
-                value={productForm.category_id}
-                onChange={(e) => updateProductField("category_id", e.target.value)}
-              >
-                <option value="">Select Category</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                value={productForm.brand_id}
-                onChange={(e) => updateProductField("brand_id", e.target.value)}
-              >
-                <option value="">Select Brand</option>
-                {brands.map((brand) => (
-                  <option key={brand.id} value={brand.id}>
-                    {brand.name}
-                  </option>
-                ))}
-              </select>
-
-              <input
-                className="span-2"
-                placeholder="Short description"
-                value={productForm.short_description}
-                onChange={(e) => updateProductField("short_description", e.target.value)}
-              />
-
-              <textarea
-                className="span-2"
-                placeholder="Full description"
-                value={productForm.description}
-                onChange={(e) => updateProductField("description", e.target.value)}
-              />
-
-              <button className="span-2">Add Product →</button>
+              <button type="submit" className="admin-submit-btn">
+                Add Product <span className="arr">→</span>
+              </button>
             </form>
 
-            <div className="product-admin-grid">
+            {/* Product list */}
+            <div className="product-admin-list">
               {products.map((product) => (
-                <div className="product-admin-card" key={product.id}>
+                <div className="product-admin-row" key={product.id}>
                   <div>
-                    <h3>{product.name}</h3>
-                    <p>
-                      {product.brands?.name || "No Brand"} •{" "}
-                      {product.categories?.name || "No Category"}
+                    <p className="prod-name">{product.name}</p>
+                    <p className="prod-meta">
+                      {product.brands?.name || "No Brand"} · {product.categories?.name || "No Category"}
                     </p>
-                    <strong>{formatLKR(product.price)}</strong>
+                    <p className="prod-price">{formatLKR(product.price)}</p>
                   </div>
 
                   <div className="product-actions">
@@ -381,9 +395,8 @@ function AdminDashboard() {
                       defaultValue={product.stock_qty}
                       onBlur={(e) => updateProductStock(product.id, e.target.value)}
                     />
-
                     <button
-                      className={product.is_active ? "active-btn" : "inactive-btn"}
+                      className={`status-pill ${product.is_active ? "active" : "inactive"}`}
                       onClick={() => updateProductStatus(product.id, !product.is_active)}
                     >
                       {product.is_active ? "Active" : "Inactive"}
@@ -392,14 +405,22 @@ function AdminDashboard() {
                 </div>
               ))}
             </div>
+
+            <div className="panel-footer">
+              <p>🔒 Stock changes save on blur. Toggle visibility with the status pill.</p>
+            </div>
           </div>
         )}
 
+        {/* ── Orders tab ── */}
         {activeTab === "orders" && (
           <div className="admin-panel">
-            <div className="panel-title">
-              <h2>Orders</h2>
-              <p>Track customer orders and update delivery status.</p>
+            <div className="panel-header">
+              <div className="panel-header-text">
+                <h2>Orders</h2>
+                <p>Track customer orders and update delivery status.</p>
+              </div>
+              <div className="panel-header-icon">🧾</div>
             </div>
 
             <div className="admin-list">
@@ -410,7 +431,6 @@ function AdminDashboard() {
                       <h3>{order.order_number}</h3>
                       <p>{new Date(order.created_at).toLocaleString()}</p>
                     </div>
-
                     <select
                       value={order.order_status}
                       onChange={(e) => updateOrderStatus(order.id, e.target.value)}
@@ -424,20 +444,11 @@ function AdminDashboard() {
                   </div>
 
                   <div className="admin-card-body">
-                    <p>
-                      <b>Total:</b> {formatLKR(order.total_amount)}
-                    </p>
-                    <p>
-                      <b>Payment:</b> {order.payment_status}
-                    </p>
-
+                    <p><b>Total:</b> {formatLKR(order.total_amount)}</p>
+                    <p><b>Payment:</b> {order.payment_status}</p>
                     {order.addresses && (
-                      <p>
-                        <b>Address:</b> {order.addresses.line1},{" "}
-                        {order.addresses.city}
-                      </p>
+                      <p><b>Address:</b> {order.addresses.line1}, {order.addresses.city}</p>
                     )}
-
                     <div className="mini-items">
                       {order.order_items?.map((item) => (
                         <span key={item.id}>
@@ -452,11 +463,15 @@ function AdminDashboard() {
           </div>
         )}
 
+        {/* ── Repairs tab ── */}
         {activeTab === "repairs" && (
           <div className="admin-panel">
-            <div className="panel-title">
-              <h2>Repair Requests</h2>
-              <p>Manage customer repair bookings and service progress.</p>
+            <div className="panel-header">
+              <div className="panel-header-text">
+                <h2>Repair Requests</h2>
+                <p>Manage customer repair bookings and service progress.</p>
+              </div>
+              <div className="panel-header-icon">🛠</div>
             </div>
 
             <div className="admin-list">
@@ -465,11 +480,8 @@ function AdminDashboard() {
                   <div className="admin-card-top">
                     <div>
                       <h3>{repair.device_type} Repair</h3>
-                      <p>
-                        {repair.brand} {repair.model}
-                      </p>
+                      <p>{repair.brand} {repair.model}</p>
                     </div>
-
                     <select
                       value={repair.status}
                       onChange={(e) => updateRepairStatus(repair.id, e.target.value)}
@@ -483,19 +495,10 @@ function AdminDashboard() {
                   </div>
 
                   <div className="admin-card-body">
-                    <p>
-                      <b>Issue:</b> {repair.issue_description}
-                    </p>
-                    <p>
-                      <b>Customer:</b> {repair.contact_name}
-                    </p>
-                    <p>
-                      <b>Phone:</b> {repair.contact_phone}
-                    </p>
-                    <p>
-                      <b>Preferred Date:</b>{" "}
-                      {repair.preferred_date || "Not selected"}
-                    </p>
+                    <p><b>Issue:</b> {repair.issue_description}</p>
+                    <p><b>Customer:</b> {repair.contact_name}</p>
+                    <p><b>Phone:</b> {repair.contact_phone}</p>
+                    <p><b>Preferred Date:</b> {repair.preferred_date || "Not selected"}</p>
                   </div>
                 </div>
               ))}
