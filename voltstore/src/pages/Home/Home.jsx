@@ -312,8 +312,13 @@ function Home() {
           </div>
 
           <div className="repair-actions">
-            <button className="btn-primary">Book Repair →</button>
-            <button className="repair-call">📞 Call Technician</button>
+            <Link to="/repair" className="btn-primary">
+              Book Repair →
+            </Link>
+
+            <Link to="/" className="repair-call">
+              📞 Call Technician
+            </Link>
           </div>
         </div>
 
