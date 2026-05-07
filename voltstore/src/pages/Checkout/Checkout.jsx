@@ -408,6 +408,38 @@ function Checkout() {
 
       if (paymentError) throw paymentError;
 
+      // SEND ORDER EMAIL
+      const emailItems = cart.map((item) => ({
+        product_name: item.product.name,
+        quantity: item.quantity,
+        unit_price: item.product.price,
+        line_total: item.product.price * item.quantity,
+      }));
+
+      const { error: emailError } = await supabase.functions.invoke("send-order-email", {
+        body: {
+          email: user.email,
+          customerName: form.fullName,
+          orderNumber,
+          paymentMethod:
+            paymentMethod === "online"
+              ? "Card Payment"
+              : "Cash on Delivery",
+          paymentStatus:
+            paymentMethod === "online"
+              ? "Paid"
+              : "Pending",
+          subtotal,
+          deliveryFee,
+          total,
+          items: emailItems,
+        },
+      });
+
+      if (emailError) {
+        console.error("Order email failed:", emailError);
+      }
+
       clearCart();
       navigate(`/order-success/${orderNumber}`);
     } catch (error) {
