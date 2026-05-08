@@ -69,6 +69,26 @@ function Repair() {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
+  async function sendRepairEmail(repairData) {
+    const { error } = await supabase.functions.invoke("send-repair-email", {
+      body: {
+        email: user.email,
+        customerName: form.name,
+        type: "received",
+        deviceType: form.device,
+        brand: form.brand,
+        model: form.model,
+        issueDescription: form.issue,
+        preferredDate: form.date,
+        status: repairData.status || "pending",
+      },
+    });
+
+    if (error) {
+      console.error("Repair email error:", error);
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
 
@@ -83,29 +103,40 @@ function Repair() {
       setLoading(true);
       setMessage({ text: "", type: "" });
 
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .update({
-        phone: form.phone,
-      })
-      .eq("id", user.id);
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({
+          phone: form.phone,
+        })
+        .eq("id", user.id);
 
-    if (profileError) throw profileError;
+      if (profileError) throw profileError;
 
-      const { error } = await supabase.from("repair_requests").insert({
-        user_id: user.id,
-        device_type: form.device,
-        brand: form.brand,
-        model: form.model,
-        issue_description: form.issue,
-        preferred_date: form.date || null,
-        contact_name: form.name,
-        contact_phone: form.phone,
-      });
+      const { data, error } = await supabase
+        .from("repair_requests")
+        .insert({
+          user_id: user.id,
+          device_type: form.device,
+          brand: form.brand,
+          model: form.model,
+          issue_description: form.issue,
+          preferred_date: form.date || null,
+          contact_name: form.name,
+          contact_phone: form.phone,
+          status: "pending",
+        })
+        .select()
+        .single();
 
       if (error) throw error;
 
-      setMessage({ text: "Repair request submitted! We'll call you shortly.", type: "success" });
+      await sendRepairEmail(data);
+
+      setMessage({
+        text: "Repair request submitted! Confirmation email sent.",
+        type: "success",
+      });
+
       setForm({
         device: "Smartphone",
         brand: "",
@@ -125,8 +156,6 @@ function Repair() {
 
   return (
     <section className="repair-page">
-
-      {/* LEFT PANEL */}
       <div className="repair-left-panel">
         <div className="repair-section-lbl">Repair Service</div>
         <h1 className="repair-panel-title">
@@ -160,10 +189,7 @@ function Repair() {
         </div>
       </div>
 
-      {/* FORM CARD */}
       <div className="repair-form-card">
-        {/* top accent line via CSS ::before */}
-
         <div className="repair-form-header">
           <div>
             <h2>Book a Repair</h2>
@@ -172,7 +198,6 @@ function Repair() {
           <div className="repair-form-icon">🔧</div>
         </div>
 
-        {/* Progress tabs */}
         <div className="repair-form-tabs">
           {["Device", "Issue", "Contact"].map((tab, i) => (
             <div className="repair-tab" key={tab}>
@@ -183,15 +208,15 @@ function Repair() {
         </div>
 
         <form className="repair-form-body" onSubmit={handleSubmit}>
-
-          {/* Device type pills */}
           <div className="field-section-title">Device Type *</div>
           <div className="device-pills">
             {DEVICE_TYPES.map(({ icon, label }) => (
               <button
                 type="button"
                 key={label}
-                className={`device-pill ${form.device === label ? "active" : ""}`}
+                className={`device-pill ${
+                  form.device === label ? "active" : ""
+                }`}
                 onClick={() => update("device", label)}
               >
                 <span>{icon}</span> {label}
@@ -209,12 +234,14 @@ function Repair() {
                 required
               />
             </div>
+
             <div className="field">
               <label>Model *</label>
               <input
                 placeholder="e.g. iPhone 14 Pro"
                 value={form.model}
                 onChange={(e) => update("model", e.target.value)}
+                required
               />
             </div>
           </div>
@@ -240,6 +267,7 @@ function Repair() {
                 onChange={(e) => update("date", e.target.value)}
               />
             </div>
+
             <div className="field">
               <label>Service Type</label>
               <select
@@ -266,6 +294,7 @@ function Repair() {
                 required
               />
             </div>
+
             <div className="field">
               <label>Phone Number *</label>
               <input
@@ -284,16 +313,24 @@ function Repair() {
           )}
 
           <button className="repair-submit-btn" disabled={loading} type="submit">
-            {loading ? "Submitting…" : <>Submit Request <span className="arr">→</span></>}
+            {loading ? (
+              "Submitting…"
+            ) : (
+              <>
+                Submit Request <span className="arr">→</span>
+              </>
+            )}
           </button>
         </form>
 
         <div className="repair-form-footer">
           <span>🔒</span>
-          <p>Your information is securely stored and only used to process your repair request.</p>
+          <p>
+            Your information is securely stored and only used to process your
+            repair request.
+          </p>
         </div>
       </div>
-
     </section>
   );
 }
