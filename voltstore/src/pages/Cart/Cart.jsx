@@ -6,6 +6,75 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "./Cart.css";
 
+const EmptyCartIllustration = () => (
+  <svg
+    className="empty-cart-svg"
+    viewBox="0 0 200 200"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+  >
+    {/* Handle */}
+    <path
+      d="M30,60 Q30,30 60,30 L160,30"
+      fill="none"
+      stroke="var(--accent)"
+      strokeWidth="5"
+      strokeLinecap="round"
+    />
+    {/* Handle stem */}
+    <line
+      x1="30" y1="60" x2="38" y2="105"
+      stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"
+    />
+
+    {/* Cart body */}
+    <rect
+      x="38" y="105" width="138" height="60"
+      rx="12"
+      fill="var(--bg-card)"
+      stroke="var(--accent)"
+      strokeWidth="3"
+    />
+
+    {/* Grid lines */}
+    <line x1="38" y1="130" x2="176" y2="130" stroke="var(--accent)" strokeWidth="1" opacity="0.25"/>
+    <line x1="38" y1="150" x2="176" y2="150" stroke="var(--accent)" strokeWidth="1" opacity="0.25"/>
+    <line x1="84" y1="105" x2="84" y2="165" stroke="var(--accent)" strokeWidth="1" opacity="0.25"/>
+    <line x1="130" y1="105" x2="130" y2="165" stroke="var(--accent)" strokeWidth="1" opacity="0.25"/>
+
+    {/* Eyes */}
+    <circle cx="80" cy="122" r="7" fill="var(--accent)"/>
+    <circle cx="80" cy="122" r="3" fill="var(--bg-card)"/>
+    <circle cx="126" cy="122" r="7" fill="var(--accent)"/>
+    <circle cx="126" cy="122" r="3" fill="var(--bg-card)"/>
+
+    {/* Sad mouth */}
+    <path
+      d="M90,148 Q107,140 124,148"
+      fill="none"
+      stroke="var(--accent)"
+      strokeWidth="3"
+      strokeLinecap="round"
+    />
+
+    {/* Legs */}
+    <line x1="176" y1="165" x2="183" y2="182" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
+    <line x1="38"  y1="165" x2="31"  y2="182" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
+
+    {/* Wheels */}
+    <circle cx="52"  cy="186" r="12" fill="var(--bg-card)" stroke="var(--accent)" strokeWidth="3"/>
+    <circle cx="52"  cy="186" r="5"  fill="var(--bg-soft)" stroke="var(--accent)" strokeWidth="2"/>
+    <circle cx="162" cy="186" r="12" fill="var(--bg-card)" stroke="var(--accent)" strokeWidth="3"/>
+    <circle cx="162" cy="186" r="5"  fill="var(--bg-soft)" stroke="var(--accent)" strokeWidth="2"/>
+
+    {/* Floating stars / sparkles */}
+    <circle cx="12"  cy="50"  r="3" fill="var(--accent)" opacity="0.4"/>
+    <circle cx="188" cy="65"  r="4" fill="var(--accent)" opacity="0.3"/>
+    <circle cx="20"  cy="95"  r="2" fill="var(--accent)" opacity="0.3"/>
+    <circle cx="180" cy="100" r="2.5" fill="var(--accent)" opacity="0.35"/>
+  </svg>
+);
+
 function Cart() {
   const {
     cart,
@@ -18,15 +87,13 @@ function Cart() {
 
   const navigate = useNavigate();
   const { user, authLoading } = useAuth();
+
   function handleCheckout() {
-
     if (authLoading) return;
-
     if (!user) {
       navigate("/login");
       return;
     }
-
     navigate("/checkout");
   }
 
@@ -34,6 +101,7 @@ function Cart() {
     return (
       <section className="cart-page">
         <div className="empty-cart">
+          <EmptyCartIllustration />
           <h1>Your cart is empty</h1>
           <p>Add products to your cart and they will appear here.</p>
           <Link to="/shop" className="shop-now-btn">Shop Now</Link>
@@ -41,7 +109,6 @@ function Cart() {
       </section>
     );
   }
-
 
   return (
     <section className="cart-page">
@@ -73,7 +140,6 @@ function Cart() {
                   <h3>{item.product.name}</h3>
                   <p>{item.product.brands?.name}</p>
                   <strong>{formatLKR(item.product.price)}</strong>
-
                   <button
                     className="remove-btn"
                     onClick={() => removeFromCart(item.product.id)}
@@ -90,9 +156,7 @@ function Cart() {
                   >
                     −
                   </button>
-
                   <span>{item.quantity}</span>
-
                   <button
                     onClick={() =>
                       updateQuantity(item.product.id, item.quantity + 1)
@@ -128,9 +192,9 @@ function Cart() {
             <strong>{formatLKR(total)}</strong>
           </div>
 
-         <button className="checkout-btn" onClick={handleCheckout}>
-          Proceed to Checkout
-        </button>
+          <button className="checkout-btn" onClick={handleCheckout}>
+            Proceed to Checkout
+          </button>
           <Link to="/shop" className="continue-link">
             Continue Shopping
           </Link>
