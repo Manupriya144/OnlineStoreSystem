@@ -17,6 +17,11 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   const [imageFiles, setImageFiles] = useState([]);
+  const [addingProduct, setAddingProduct] = useState(false);
+  const [productMessage, setProductMessage] = useState({ text: "", type: "" });
+  const [toast, setToast] = useState({ text: "", type: "" });
+
+  const [specs, setSpecs] = useState([{ spec_name: "", spec_value: "" }]);
 
   const [productForm, setProductForm] = useState({
     name: "",
@@ -30,6 +35,14 @@ function AdminDashboard() {
     category_id: "",
     brand_id: "",
   });
+
+  function showToast(text, type = "success") {
+    setToast({ text, type });
+
+    setTimeout(() => {
+      setToast({ text: "", type: "" });
+    }, 3000);
+  }
 
   function slugify(text) {
     return text
@@ -45,6 +58,22 @@ function AdminDashboard() {
       [key]: value,
       slug: key === "name" ? slugify(value) : prev.slug,
     }));
+  }
+
+  function updateSpec(index, key, value) {
+    setSpecs((prev) =>
+      prev.map((spec, i) =>
+        i === index ? { ...spec, [key]: value } : spec
+      )
+    );
+  }
+
+  function addSpecRow() {
+    setSpecs((prev) => [...prev, { spec_name: "", spec_value: "" }]);
+  }
+
+  function removeSpecRow(index) {
+    setSpecs((prev) => prev.filter((_, i) => i !== index));
   }
 
   async function loadAdminData() {
@@ -66,7 +95,8 @@ function AdminDashboard() {
         *,
         categories(name),
         brands(name),
-        product_images(id, image_path, is_primary, created_at)
+        product_images(id, image_path, is_primary, created_at),
+        product_specs(id, spec_name, spec_value)
       `)
       .order("created_at", { ascending: false });
 
@@ -88,7 +118,7 @@ function AdminDashboard() {
     setLoading(false);
   }
 
- useEffect(() => {
+  useEffect(() => {
     if (authLoading) return;
 
     if (role === "admin") {
@@ -102,8 +132,10 @@ function AdminDashboard() {
       .update({ order_status: status })
       .eq("id", orderId);
 
+    showToast("Order status updated", "success");
     loadAdminData();
   }
+
   async function updatePaymentStatus(orderId, status) {
     await supabase
       .from("orders")
@@ -118,6 +150,7 @@ function AdminDashboard() {
       })
       .eq("order_id", orderId);
 
+    showToast("Payment status updated", "success");
     loadAdminData();
   }
 
@@ -127,84 +160,143 @@ function AdminDashboard() {
       .update({ status })
       .eq("id", repairId);
 
+    showToast("Repair status updated", "success");
     loadAdminData();
   }
 
   async function addProduct(e) {
     e.preventDefault();
 
-    const { data: productData, error: productError } = await supabase
-      .from("products")
-      .insert({
-        name: productForm.name,
-        slug: productForm.slug,
-        model: productForm.model,
-        short_description: productForm.short_description,
-        description: productForm.description,
-        price: Number(productForm.price),
-        stock_qty: Number(productForm.stock_qty),
-        sku: productForm.sku || null,
-        category_id: productForm.category_id || null,
-        brand_id: productForm.brand_id || null,
-        is_active: true,
-      })
-      .select()
-      .single();
+    try {
+      setAddingProduct(true);
+      setProductMessage({ text: "", type: "" });
 
-    if (productError) {
-      alert(productError.message);
-      return;
-    }
+      const { data: productData, error: productError } = await supabase
+        .from("products")
+        .insert({
+          name: productForm.name,
+          slug: productForm.slug,
+          model: productForm.model || null,
+          short_description: productForm.short_description || null,
+          description: productForm.description || null,
+          price: Number(productForm.price),
+          stock_qty: Number(productForm.stock_qty),
+          sku: productForm.sku || null,
+          category_id: productForm.category_id || null,
+          brand_id: productForm.brand_id || null,
+          is_active: true,
+        })
+        .select()
+        .single();
 
-    if (imageFiles.length > 0) {
-      const imageRows = [];
+      if (productError) throw productError;
 
-      for (let i = 0; i < imageFiles.length; i++) {
-        const file = imageFiles[i];
-        const fileExt = file.name.split(".").pop();
-        const fileName = `${Date.now()}-${i}-${productForm.slug}.${fileExt}`;
+      if (imageFiles.length > 0) {
+        const imageRows = [];
 
-        const { error: uploadError } = await supabase.storage
-          .from("product")
-          .upload(fileName, file);
+        for (let i = 0; i < imageFiles.length; i++) {
+          const file = imageFiles[i];
+          const fileExt = file.name.split(".").pop();
+          const fileName = `${productData.id}/${Date.now()}-${i}.${fileExt}`;
 
-        if (uploadError) {
-          alert(uploadError.message);
-          return;
+          const { error: uploadError } = await supabase.storage
+            .from("product")
+            .upload(fileName, file);
+
+          if (uploadError) throw uploadError;
+
+          imageRows.push({
+            product_id: productData.id,
+            image_path: fileName,
+            is_primary: i === 0,
+          });
         }
 
-        imageRows.push({
+        const { error: imageInsertError } = await supabase
+          .from("product_images")
+          .insert(imageRows);
+
+        if (imageInsertError) throw imageInsertError;
+      }
+
+      const validSpecs = specs.filter(
+        (spec) => spec.spec_name.trim() && spec.spec_value.trim()
+      );
+
+      if (validSpecs.length > 0) {
+        const specRows = validSpecs.map((spec) => ({
           product_id: productData.id,
-          image_path: fileName,
-          is_primary: i === 0,
-        });
+          spec_name: spec.spec_name.trim(),
+          spec_value: spec.spec_value.trim(),
+        }));
+
+        const { error: specError } = await supabase
+          .from("product_specs")
+          .insert(specRows);
+
+        if (specError) throw specError;
       }
 
-      const { error: imageInsertError } = await supabase
-        .from("product_images")
-        .insert(imageRows);
+      setProductMessage({
+        text: "Product added successfully!",
+        type: "success",
+      });
 
-      if (imageInsertError) {
-        alert(imageInsertError.message);
-        return;
-      }
+      setImageFiles([]);
+      setSpecs([{ spec_name: "", spec_value: "" }]);
+
+      setProductForm({
+        name: "",
+        slug: "",
+        model: "",
+        short_description: "",
+        description: "",
+        price: "",
+        stock_qty: "",
+        sku: "",
+        category_id: "",
+        brand_id: "",
+      });
+
+      loadAdminData();
+    } catch (err) {
+      setProductMessage({
+        text: err.message || "Product adding failed",
+        type: "error",
+      });
+    } finally {
+      setAddingProduct(false);
     }
+  }
 
-    setImageFiles([]);
-    setProductForm({
-      name: "",
-      slug: "",
-      model: "",
-      short_description: "",
-      description: "",
-      price: "",
-      stock_qty: "",
-      sku: "",
-      category_id: "",
-      brand_id: "",
-    });
+  async function deleteProduct(product) {
+    const confirmed = window.confirm(`Delete "${product.name}" permanently?`);
 
-    loadAdminData();
+    if (!confirmed) return;
+
+    try {
+      if (product.product_images?.length > 0) {
+        const paths = product.product_images.map((img) => img.image_path);
+
+        const { error: storageError } = await supabase.storage
+          .from("product")
+          .remove(paths);
+
+        if (storageError) throw storageError;
+      }
+
+      const { error } = await supabase
+        .from("products")
+        .delete()
+        .eq("id", product.id);
+
+      if (error) throw error;
+
+      showToast("Product deleted successfully!", "success");
+      loadAdminData();
+    } catch (err) {
+      showToast(err.message || "Failed to delete product", "error");
+    }
   }
 
   async function updateProductStock(productId, stockQty) {
@@ -213,6 +305,7 @@ function AdminDashboard() {
       .update({ stock_qty: Number(stockQty) })
       .eq("id", productId);
 
+    showToast("Stock updated", "success");
     loadAdminData();
   }
 
@@ -222,6 +315,7 @@ function AdminDashboard() {
       .update({ is_active: isActive })
       .eq("id", productId);
 
+    showToast("Product status updated", "success");
     loadAdminData();
   }
 
@@ -241,6 +335,12 @@ function AdminDashboard() {
 
   return (
     <section className="admin-shell">
+      {toast.text && (
+        <div className={`admin-toast ${toast.type}`}>
+          {toast.type === "success" ? "✓" : "✕"} {toast.text}
+        </div>
+      )}
+
       <aside className="admin-sidebar">
         <div className="admin-brand">
           <div className="admin-brand-icon">TE</div>
@@ -288,16 +388,19 @@ function AdminDashboard() {
             <span>Total Orders</span>
             <strong>{orders.length}</strong>
           </div>
+
           <div className="admin-stat-card">
             <span>Pending Orders</span>
             <strong>
               {orders.filter((o) => o.order_status === "pending").length}
             </strong>
           </div>
+
           <div className="admin-stat-card">
             <span>Repair Requests</span>
             <strong>{repairs.length}</strong>
           </div>
+
           <div className="admin-stat-card">
             <span>Total Products</span>
             <strong>{products.length}</strong>
@@ -458,14 +561,77 @@ function AdminDashboard() {
 
                 {imageFiles.length > 0 && (
                   <p className="field-file-name">
-                    📎 {imageFiles.length} image(s) selected. First image will
-                    be primary.
+                    📎 {imageFiles.length} image(s) selected. First image will be
+                    primary.
                   </p>
                 )}
               </div>
 
-              <button type="submit" className="admin-submit-btn">
-                Add Product <span className="arr">→</span>
+              <span className="form-section-title">Product Specifications</span>
+
+              {specs.map((spec, index) => (
+                <div className="form-grid-2" key={index}>
+                  <div className="field">
+                    <label>Spec Name</label>
+                    <input
+                      placeholder="e.g. RAM"
+                      value={spec.spec_name}
+                      onChange={(e) =>
+                        updateSpec(index, "spec_name", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className="field">
+                    <label>Spec Value</label>
+                    <input
+                      placeholder="e.g. 8GB"
+                      value={spec.spec_value}
+                      onChange={(e) =>
+                        updateSpec(index, "spec_value", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  {specs.length > 1 && (
+                    <button
+                      type="button"
+                      className="admin-remove-btn"
+                      onClick={() => removeSpecRow(index)}
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              ))}
+
+              <button
+                type="button"
+                className="admin-secondary-btn"
+                onClick={addSpecRow}
+              >
+                + Add Specification
+              </button>
+
+              {productMessage.text && (
+                <div className={`admin-message ${productMessage.type}`}>
+                  {productMessage.type === "success" ? "✓" : "✕"}{" "}
+                  {productMessage.text}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="admin-submit-btn"
+                disabled={addingProduct}
+              >
+                {addingProduct ? (
+                  "Adding Product..."
+                ) : (
+                  <>
+                    Add Product <span className="arr">→</span>
+                  </>
+                )}
               </button>
             </form>
 
@@ -480,7 +646,8 @@ function AdminDashboard() {
                     </p>
                     <p className="prod-price">{formatLKR(product.price)}</p>
                     <p className="prod-meta">
-                      Images: {product.product_images?.length || 0}
+                      Images: {product.product_images?.length || 0} · Specs:{" "}
+                      {product.product_specs?.length || 0}
                     </p>
                   </div>
 
@@ -502,6 +669,13 @@ function AdminDashboard() {
                       }
                     >
                       {product.is_active ? "Active" : "Inactive"}
+                    </button>
+
+                    <button
+                      className="delete-product-btn"
+                      onClick={() => deleteProduct(product)}
+                    >
+                      Delete
                     </button>
                   </div>
                 </div>
@@ -554,6 +728,7 @@ function AdminDashboard() {
                     <p>
                       <b>Total:</b> {formatLKR(order.total_amount)}
                     </p>
+
                     <div className="order-status-grid">
                       <p>
                         <b>Payment:</b>{" "}
@@ -566,7 +741,9 @@ function AdminDashboard() {
                         Update Payment
                         <select
                           value={order.payment_status}
-                          onChange={(e) => updatePaymentStatus(order.id, e.target.value)}
+                          onChange={(e) =>
+                            updatePaymentStatus(order.id, e.target.value)
+                          }
                         >
                           <option value="pending">Pending</option>
                           <option value="paid">Paid</option>
@@ -574,6 +751,7 @@ function AdminDashboard() {
                         </select>
                       </label>
                     </div>
+
                     {order.addresses && (
                       <p>
                         <b>Address:</b> {order.addresses.line1},{" "}
