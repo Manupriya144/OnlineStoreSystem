@@ -104,6 +104,22 @@ function AdminDashboard() {
 
     loadAdminData();
   }
+  async function updatePaymentStatus(orderId, status) {
+    await supabase
+      .from("orders")
+      .update({ payment_status: status })
+      .eq("id", orderId);
+
+    await supabase
+      .from("payments")
+      .update({
+        status,
+        paid_at: status === "paid" ? new Date().toISOString() : null,
+      })
+      .eq("order_id", orderId);
+
+    loadAdminData();
+  }
 
   async function updateRepairStatus(repairId, status) {
     await supabase
@@ -538,10 +554,26 @@ function AdminDashboard() {
                     <p>
                       <b>Total:</b> {formatLKR(order.total_amount)}
                     </p>
-                    <p>
-                      <b>Payment:</b> {order.payment_status}
-                    </p>
+                    <div className="order-status-grid">
+                      <p>
+                        <b>Payment:</b>{" "}
+                        <span className={`payment-pill ${order.payment_status}`}>
+                          {order.payment_status === "paid" ? "Paid" : "Pending"}
+                        </span>
+                      </p>
 
+                      <label className="payment-update">
+                        Update Payment
+                        <select
+                          value={order.payment_status}
+                          onChange={(e) => updatePaymentStatus(order.id, e.target.value)}
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="paid">Paid</option>
+                          <option value="failed">Failed</option>
+                        </select>
+                      </label>
+                    </div>
                     {order.addresses && (
                       <p>
                         <b>Address:</b> {order.addresses.line1},{" "}

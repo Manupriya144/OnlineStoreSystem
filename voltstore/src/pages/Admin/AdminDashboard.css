@@ -991,6 +991,8 @@
   }
 }
 
+
+
 /* ─────────────────────────────────────────
    RESPONSIVE — Extra small (≤400px)
 ───────────────────────────────────────── */
@@ -1016,5 +1018,123 @@
 
   .admin-page-header h1 {
     font-size: 20px;
+  }
+}
+/* ─────────────────────────────────────────
+   PAYMENT STATUS
+───────────────────────────────────────── */
+
+.order-status-grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.payment-update {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  font-family: var(--font-display, 'Syne', sans-serif);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  color: var(--text-mid, #9b9ba3);
+}
+
+.payment-update select {
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--border-accent, rgba(255, 106, 0, 0.35));
+
+  background: var(--accent-dim, rgba(255, 106, 0, 0.12));
+  color: var(--accent, #ff6a00);
+
+  padding: 0 32px 0 12px;
+
+  font-family: var(--font-display, 'Syne', sans-serif);
+  font-size: 12px;
+  font-weight: 700;
+
+  outline: none;
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ff6a00' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.payment-update select:focus {
+  box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.1);
+}
+
+.payment-update select option {
+  background: #111118;
+  color: var(--text-main, #f0eeea);
+}
+
+/* Payment pills */
+
+.payment-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 6px 12px;
+  border-radius: 999px;
+
+  font-family: var(--font-display, 'Syne', sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+
+  border: 1px solid transparent;
+}
+
+.payment-pill.paid {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #4ade80;
+}
+
+.payment-pill.pending {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+}
+
+.payment-pill.failed {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+/* ─────────────────────────────────────────
+   MOBILE
+───────────────────────────────────────── */
+
+@media (max-width: 700px) {
+  .order-status-grid {
+    gap: 10px;
+  }
+
+  .payment-update {
+    font-size: 9px;
+  }
+
+  .payment-update select {
+    width: 100%;
+    height: 40px;
+    font-size: 13px;
+  }
+
+  .payment-pill {
+    font-size: 10px;
+    padding: 5px 10px;
   }
 }
