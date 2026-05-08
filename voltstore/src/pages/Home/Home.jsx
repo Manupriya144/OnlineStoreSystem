@@ -36,31 +36,31 @@ const categoriesData = [
     id: 1,
     name: "Smartphones",
     desc: "Latest Android & iPhone",
-    image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=600",
+    image: "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?q=80&w=600",
   },
   {
     id: 2,
     name: "Laptops",
     desc: "Work & gaming powerhouses",
-    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=600",
+    image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=600",
   },
   {
     id: 3,
     name: "Accessories",
     desc: "Headphones & chargers",
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600",
+    image: "https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=600",
   },
   {
     id: 4,
     name: "Gadgets",
     desc: "Smart devices & tech gear",
-    image: "https://images.unsplash.com/photo-1518444065439-e933c06ce9cd?q=80&w=600",
+    image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=600",
   },
   {
     id: 5,
     name: "Repair",
     desc: "Fix phones & laptops",
-    image: "https://images.unsplash.com/photo-1555617117-08d3f9b7a3c3?q=80&w=600",
+    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=600",
   },
 ];
 
@@ -126,10 +126,10 @@ function Home() {
         <div className="hero-left">
           <p className="hero-tag">Electronics · Accessories · Repairs</p>
 
-          <h1>
-            Power Your <em>Digital</em><br />
-            Life With Tazz
-          </h1>
+       <h1>
+        Built For <em>Technology</em><br />
+        Powered By Tazz
+      </h1>
 
           <p className="hero-text">
             Discover high-quality electronics, accessories, and reliable repair
