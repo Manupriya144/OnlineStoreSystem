@@ -1114,9 +1114,7 @@
   color: #f87171;
 }
 
-/* ─────────────────────────────────────────
-   MOBILE
-───────────────────────────────────────── */
+
 
 @media (max-width: 700px) {
   .order-status-grid {
@@ -1229,5 +1227,54 @@
   to {
     opacity: 1;
     transform: translateY(0) translateX(0);
+  }
+}
+
+
+.order-customer-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 106, 0, 0.06);
+  border: 1px solid rgba(255, 106, 0, 0.2);
+  margin-bottom: 4px;
+}
+
+.order-customer-name {
+  font-family: var(--font-display, 'Syne', sans-serif);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main, #f0eeea);
+}
+
+.order-customer-phone {
+  font-family: var(--font-display, 'Syne', sans-serif);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent, #ff6a00);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(255, 106, 0, 0.4);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.order-customer-phone:hover {
+  color: #ff8c3a;
+  border-bottom-color: #ff8c3a;
+}
+
+@media (max-width: 700px) {
+  .order-customer-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 10px 12px;
+  }
+
+  .order-customer-name,
+  .order-customer-phone {
+    font-size: 12px;
   }
 }

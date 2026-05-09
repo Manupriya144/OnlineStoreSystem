@@ -725,9 +725,18 @@ function AdminDashboard() {
                   </div>
 
                   <div className="admin-card-body">
-                    <p>
-                      <b>Total:</b> {formatLKR(order.total_amount)}
-                    </p>
+                    <div className="order-customer-row">
+                      <span className="order-customer-name">
+                        👤 {order.addresses?.full_name || "—"}
+                      </span>
+
+                      <a
+                        className="order-customer-phone"
+                        href={`tel:${order.addresses?.phone}`}
+                      >
+                        📞 {order.addresses?.phone || "No phone"}
+                      </a>
+                    </div>
 
                     <div className="order-status-grid">
                       <p>
