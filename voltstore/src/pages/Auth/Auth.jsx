@@ -74,8 +74,8 @@ function Auth() {
       if (mode === "forgot") {
         const redirectUrl =
           window.location.hostname === "localhost"
-            ? "http://localhost:5173/auth"
-            : "https://online-store-system-nine.vercel.app/auth";
+            ? "http://localhost:5173/login"
+            : "https://online-store-system-nine.vercel.app/login";
 
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: redirectUrl,
@@ -132,9 +132,7 @@ function Auth() {
 
   function switchMode(newMode) {
     setMode(newMode);
-
     setMessage("");
-
     setPassword("");
     setNewPassword("");
     setConfirmPassword("");
