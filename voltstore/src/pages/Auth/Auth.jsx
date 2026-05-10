@@ -22,7 +22,7 @@ function Auth() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    // Detect recovery URL from Supabase email link
+    // Detect Supabase recovery link
     const hash = window.location.hash;
 
     if (hash && hash.includes("type=recovery")) {
@@ -30,6 +30,7 @@ function Auth() {
       setMessage("Enter your new password.");
     }
 
+    // Listen for password recovery session
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
@@ -64,14 +65,20 @@ function Auth() {
         );
 
         setMode("login");
+
         setPassword("");
         setFullName("");
       }
 
       // FORGOT PASSWORD
       if (mode === "forgot") {
+        const redirectUrl =
+          window.location.hostname === "localhost"
+            ? "http://localhost:5173/auth"
+            : "https://online-store-system-nine.vercel.app/auth";
+
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/auth`,
+          redirectTo: redirectUrl,
         });
 
         if (error) throw error;
@@ -97,7 +104,9 @@ function Auth() {
 
         if (error) throw error;
 
-        setMessage("Password updated successfully. Please login.");
+        setMessage(
+          "Password updated successfully. Please login with your new password."
+        );
 
         await supabase.auth.signOut();
 
@@ -107,7 +116,7 @@ function Auth() {
         setNewPassword("");
         setConfirmPassword("");
 
-        // remove recovery hash
+        // Remove recovery hash from URL
         window.history.replaceState(
           {},
           document.title,
@@ -265,7 +274,7 @@ function Auth() {
           </button>
         </form>
 
-        {/* SWITCHES */}
+        {/* SWITCH MODES */}
         <div className="auth-switch">
           {mode === "login" && (
             <p>
