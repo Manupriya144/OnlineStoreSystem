@@ -109,7 +109,7 @@ function Home() {
 
   return (
     <>
-      {/* STATS TICKER */}
+      {/* ANNOUNCEMENT BAR */}
       <div className="stats-ticker" aria-hidden="true">
         <div className="ticker-track">
           {tickerItems.map((item, i) => (
@@ -126,10 +126,10 @@ function Home() {
         <div className="hero-left">
           <p className="hero-tag">Electronics · Accessories · Repairs</p>
 
-       <h1>
-        Built For <em>Technology</em><br />
-        Powered By Tazz
-      </h1>
+          <h1>
+            Less Searching.<br />
+            <em>More Living.</em>
+          </h1>
 
           <p className="hero-text">
             Discover high-quality electronics, accessories, and reliable repair
@@ -140,22 +140,21 @@ function Home() {
             <Link to="/shop" className="btn-primary">
               Shop Now →
             </Link>
-
             <Link to="/repair" className="btn-secondary">
               Book Repair
             </Link>
           </div>
 
           <div className="hero-stats">
-            <div>
+            <div className="hero-stat-block">
               <div className="hero-stat-value">10K<span>+</span></div>
               <div className="hero-stat-label">Happy customers</div>
             </div>
-            <div>
+            <div className="hero-stat-block">
               <div className="hero-stat-value">50<span>+</span></div>
               <div className="hero-stat-label">Brands stocked</div>
             </div>
-            <div>
+            <div className="hero-stat-block">
               <div className="hero-stat-value">4.9<span>★</span></div>
               <div className="hero-stat-label">Average rating</div>
             </div>
@@ -163,10 +162,8 @@ function Home() {
         </div>
 
         <div className="showcase">
-          {/* Glow ring */}
           <div className="sc-ring" />
 
-          {/* Corner product cards */}
           <div className="sc-card sc-c1">
             <img src="https://images.unsplash.com/photo-1585386959984-a4155224a1ad?q=80&w=200" alt="Headphones" />
             <div className="p-name">Sony WH-1000XM5</div>
@@ -191,14 +188,12 @@ function Home() {
             <div className="p-price">Rs. 298,000</div>
           </div>
 
-          {/* Center featured product */}
           <div className="sc-main">
             <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=300" alt="iPhone 15 Pro Max" />
             <div className="p-name">iPhone 15 Pro Max</div>
             <div className="p-price">Rs. 189,900</div>
           </div>
 
-          {/* Floating badges */}
           <div className="sc-badge sb1"><span className="sc-dot" />Free Delivery</div>
           <div className="sc-badge sb2"><span className="sc-dot" />Warranty Included</div>
           <div className="sc-badge sb3"><span className="sc-dot" />Same-Day Repair</div>
@@ -284,7 +279,7 @@ function Home() {
         <div className="repair-left">
           <span className="repair-badge">Repair Service</span>
 
-          <h2>Device Not Working?<br />Let Our Experts Fix It</h2>
+          <h2>Device Not Working?<br />Let Our Experts Fix It.</h2>
 
           <p>
             Book a repair for your smartphone, laptop, tablet, or accessories. Our
@@ -315,7 +310,6 @@ function Home() {
             <Link to="/repair" className="btn-primary">
               Book Repair →
             </Link>
-
             <Link to="/" className="repair-call">
               📞 Call Technician
             </Link>

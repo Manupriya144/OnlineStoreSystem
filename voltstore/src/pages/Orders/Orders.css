@@ -1,9 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap');
+
 .orders-page {
   min-height: calc(100vh - 76px);
   padding: 46px 6% 90px;
   background:
     radial-gradient(circle at top left, rgba(255, 106, 0, 0.12), transparent 30%),
-    var(--bg-main);
+    var(--bg-main, #060608);
+  font-family: 'Manrope', sans-serif;
 }
 
 .orders-header {
@@ -11,12 +14,20 @@
 }
 
 .orders-header h1 {
+  font-family: 'Playfair Display', serif;
   font-size: clamp(34px, 5vw, 52px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--text-main, #f5f5f7);
   margin-bottom: 8px;
 }
 
 .orders-header p {
-  color: var(--text-muted);
+  font-family: 'Manrope', sans-serif;
+  color: var(--text-muted, #6e6e73);
+  font-size: 15px;
+  line-height: 1.7;
 }
 
 .orders-list {
@@ -26,9 +37,10 @@
 
 .order-card {
   background: linear-gradient(145deg, #171717, #0f0f0f);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border, rgba(255,255,255,0.07));
   border-radius: 28px;
   padding: 26px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
 }
 
 .order-top {
@@ -36,17 +48,21 @@
   justify-content: space-between;
   gap: 22px;
   padding-bottom: 22px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border, rgba(255,255,255,0.07));
 }
 
 .order-top h2 {
+  font-family: 'Manrope', sans-serif;
   font-size: 22px;
-  color: var(--accent);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--accent, #ff6a00);
   margin-bottom: 6px;
 }
 
 .order-top p {
-  color: var(--text-muted);
+  font-family: 'Manrope', sans-serif;
+  color: var(--text-muted, #6e6e73);
   font-size: 14px;
 }
 
@@ -58,11 +74,13 @@
 }
 
 .status {
+  font-family: 'Manrope', sans-serif;
   padding: 7px 12px;
   border-radius: 999px;
-  font-size: 13px;
-  font-weight: 900;
+  font-size: 12px;
+  font-weight: 800;
   text-transform: capitalize;
+  letter-spacing: 0.01em;
 }
 
 .status.pending {
@@ -100,7 +118,10 @@
 }
 
 .order-body h3 {
+  font-family: 'Manrope', sans-serif;
   font-size: 17px;
+  font-weight: 800;
+  color: var(--text-main, #f5f5f7);
   margin-bottom: 14px;
 }
 
@@ -114,26 +135,30 @@
   justify-content: space-between;
   gap: 16px;
   background: #0b0b0b;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border, rgba(255,255,255,0.07));
   border-radius: 16px;
   padding: 14px;
-  color: var(--text-muted);
+  color: var(--text-muted, #6e6e73);
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
 }
 
 .order-item strong {
-  color: white;
+  color: var(--text-main, #ffffff);
   white-space: nowrap;
+  font-weight: 800;
 }
 
 .order-address {
   background: #0b0b0b;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border, rgba(255,255,255,0.07));
   border-radius: 18px;
   padding: 18px;
 }
 
 .order-address p {
-  color: var(--text-muted);
+  font-family: 'Manrope', sans-serif;
+  color: var(--text-muted, #6e6e73);
   line-height: 1.7;
   font-size: 14px;
 }
@@ -143,30 +168,33 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
   padding-top: 22px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border, rgba(255,255,255,0.07));
 }
 
 .order-bottom div {
   background: #0b0b0b;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border, rgba(255,255,255,0.07));
   border-radius: 16px;
   padding: 16px;
 }
 
 .order-bottom span {
   display: block;
-  color: var(--text-muted);
+  font-family: 'Manrope', sans-serif;
+  color: var(--text-muted, #6e6e73);
   font-size: 13px;
   margin-bottom: 8px;
 }
 
 .order-bottom strong {
-  color: white;
+  font-family: 'Manrope', sans-serif;
+  color: var(--text-main, #ffffff);
   font-size: 17px;
+  font-weight: 800;
 }
 
 .order-total strong {
-  color: var(--accent);
+  color: var(--accent, #ff6a00);
   font-size: 20px;
 }
 
@@ -179,6 +207,7 @@
   text-align: center;
   flex-direction: column;
   gap: 16px;
+  font-family: 'Manrope', sans-serif;
 }
 
 .empty-orders-svg {
@@ -190,32 +219,39 @@
 
 @keyframes orders-float {
   0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-10px); }
+  50% { transform: translateY(-10px); }
 }
 
 .empty-orders h1 {
-  font-size: 32px;
+  font-family: 'Playfair Display', serif;
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text-main, #f5f5f7);
   margin: 0;
 }
 
 .empty-orders p {
-  color: var(--text-muted);
+  color: var(--text-muted, #6e6e73);
   margin: 0;
+  line-height: 1.7;
 }
 
 .empty-orders a {
-  background: var(--accent);
+  background: var(--accent, #ff6a00);
   color: white;
   padding: 14px 28px;
   border-radius: 999px;
-  font-weight: 900;
+  font-weight: 800;
   margin-top: 8px;
   display: inline-block;
-  transition: opacity 0.2s;
+  text-decoration: none;
+  transition: all 0.22s ease;
 }
 
 .empty-orders a:hover {
-  opacity: 0.85;
+  opacity: 0.9;
+  transform: translateY(-2px);
 }
 
 /* ── Responsive ──────────────────────────────── */
@@ -231,5 +267,24 @@
 
   .order-bottom {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .orders-page {
+    padding: 36px 5% 70px;
+  }
+
+  .order-card {
+    padding: 20px;
+    border-radius: 22px;
+  }
+
+  .orders-header h1 {
+    font-size: 36px;
+  }
+
+  .order-item {
+    flex-direction: column;
   }
 }

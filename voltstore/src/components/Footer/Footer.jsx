@@ -28,7 +28,6 @@ function Footer() {
         {/* QUICK LINKS */}
         <div className="footer-column">
           <h4>Quick Links</h4>
-
           <Link to="/">Home</Link>
           <Link to="/shop">Shop</Link>
           <Link to="/repair">Repair</Link>
@@ -38,7 +37,6 @@ function Footer() {
         {/* SERVICES */}
         <div className="footer-column">
           <h4>Services</h4>
-
           <p>Phone Repair</p>
           <p>Laptop Repair</p>
           <p>Battery Replacement</p>
@@ -48,7 +46,6 @@ function Footer() {
         {/* CONTACT */}
         <div className="footer-column">
           <h4>Contact</h4>
-
           <p>support@tazz.lk</p>
           <p>+94 77 123 4567</p>
           <p>Colombo, Sri Lanka</p>
@@ -62,7 +59,6 @@ function Footer() {
 
       <div className="footer-bottom">
         <p>© 2026 Tazz Electronics. All rights reserved.</p>
-
         <div>
           <span>Privacy Policy</span>
           <span>Terms</span>

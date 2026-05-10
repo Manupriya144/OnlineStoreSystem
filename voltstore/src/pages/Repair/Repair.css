@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap');
+
 /* ─────────────────────────────────────────
    REPAIR PAGE
 ───────────────────────────────────────── */
@@ -25,7 +27,7 @@
 
 .repair-section-lbl {
   display: inline-block;
-  font-family: var(--font-display, 'Syne', sans-serif);
+  font-family: 'Manrope', sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.2em;
@@ -39,9 +41,9 @@
 }
 
 .repair-panel-title {
-  font-family: var(--font-display, 'Syne', sans-serif);
-  font-size: clamp(28px, 3vw, 38px);
-  font-weight: 800;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(30px, 3vw, 42px);
+  font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.08;
   margin-bottom: 14px;
@@ -54,9 +56,10 @@
 }
 
 .repair-panel-sub {
+  font-family: 'Manrope', sans-serif;
   color: var(--text-muted, #6b6b72);
-  font-size: 13px;
-  line-height: 1.8;
+  font-size: 14px;
+  line-height: 1.9;
   margin-bottom: 34px;
 }
 
@@ -95,7 +98,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-display, 'Syne', sans-serif);
+  font-family: 'Manrope', sans-serif;
   font-size: 12px;
   font-weight: 800;
   color: var(--accent, #FF6A00);
@@ -103,7 +106,7 @@
 }
 
 .step-text h4 {
-  font-family: var(--font-display, 'Syne', sans-serif);
+  font-family: 'Manrope', sans-serif;
   font-size: 13px;
   font-weight: 700;
   color: var(--text-main, #f0eeea);
@@ -111,9 +114,10 @@
 }
 
 .step-text p {
+  font-family: 'Manrope', sans-serif;
   font-size: 12px;
   color: var(--text-muted, #6b6b72);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 /* Trust grid */
@@ -126,13 +130,14 @@
 .trust-item {
   background: var(--bg-card, #0e0e12);
   border: 1px solid var(--border, rgba(255,255,255,0.07));
-  border-radius: 14px;
-  padding: 14px;
-  transition: border-color 0.25s ease;
+  border-radius: 16px;
+  padding: 16px;
+  transition: all 0.25s ease;
 }
 
 .trust-item:hover {
   border-color: var(--border-accent, rgba(255,106,0,0.35));
+  transform: translateY(-3px);
 }
 
 .trust-icon {
@@ -141,7 +146,7 @@
 }
 
 .trust-item h5 {
-  font-family: var(--font-display, 'Syne', sans-serif);
+  font-family: 'Manrope', sans-serif;
   font-size: 12px;
   font-weight: 700;
   color: var(--text-main, #f0eeea);
@@ -149,9 +154,10 @@
 }
 
 .trust-item p {
+  font-family: 'Manrope', sans-serif;
   font-size: 11px;
   color: var(--text-muted, #6b6b72);
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 /* ─────────────────────────────────────────
@@ -162,10 +168,11 @@
   max-width: 640px;
   background: linear-gradient(145deg, #101018, #0c0c12);
   border: 1px solid var(--border, rgba(255,255,255,0.07));
-  border-radius: 28px;
+  border-radius: 30px;
   overflow: hidden;
-  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.45);
   position: relative;
+  backdrop-filter: blur(18px);
 }
 
 .repair-form-card::before {
@@ -188,8 +195,8 @@
 }
 
 .repair-form-header h2 {
-  font-family: var(--font-display, 'Syne', sans-serif);
-  font-size: 20px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 21px;
   font-weight: 800;
   letter-spacing: -0.02em;
   margin-bottom: 4px;
@@ -197,16 +204,17 @@
 }
 
 .repair-form-header p {
+  font-family: 'Manrope', sans-serif;
   font-size: 12px;
   color: var(--text-muted, #6b6b72);
 }
 
 .repair-form-icon {
-  width: 46px;
-  height: 46px;
+  width: 48px;
+  height: 48px;
   background: var(--accent-dim, rgba(255,106,0,0.12));
   border: 1px solid var(--border-accent, rgba(255,106,0,0.35));
-  border-radius: 14px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -242,7 +250,7 @@
 }
 
 .tab-label {
-  font-family: var(--font-display, 'Syne', sans-serif);
+  font-family: 'Manrope', sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -260,7 +268,7 @@
 
 /* Section dividers */
 .field-section-title {
-  font-family: var(--font-display, 'Syne', sans-serif);
+  font-family: 'Manrope', sans-serif;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -287,16 +295,16 @@
 }
 
 .device-pill {
-  padding: 8px 15px;
+  padding: 9px 16px;
   border-radius: 999px;
   border: 1px solid var(--border, rgba(255,255,255,0.07));
   background: transparent;
   color: var(--text-mid, #9b9ba3);
-  font-family: var(--font-display, 'Syne', sans-serif);
+  font-family: 'Manrope', sans-serif;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.22s ease;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -324,7 +332,7 @@
 }
 
 .field label {
-  font-family: var(--font-display, 'Syne', sans-serif);
+  font-family: 'Manrope', sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -336,16 +344,16 @@
 .field textarea,
 .field select {
   width: 100%;
-  height: 48px;
+  height: 50px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border, rgba(255,255,255,0.07));
-  border-radius: 14px;
+  border-radius: 16px;
   color: var(--text-main, #f0eeea);
   padding: 0 16px;
-  font-family: var(--font-body, 'DM Sans', sans-serif);
+  font-family: 'Manrope', sans-serif;
   font-size: 14px;
   outline: none;
-  transition: all 0.2s ease;
+  transition: all 0.22s ease;
   appearance: none;
   -webkit-appearance: none;
 }
@@ -359,15 +367,15 @@
 .field textarea:focus,
 .field select:focus {
   border-color: var(--accent, #FF6A00);
-  background: var(--accent-dim, rgba(255,106,0,0.12));
-  box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.1);
+  background: rgba(255,106,0,0.06);
+  box-shadow: 0 0 0 4px rgba(255, 106, 0, 0.08);
 }
 
 .field textarea {
   height: 110px;
   padding: 14px 16px;
   resize: vertical;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 .field select {
@@ -383,53 +391,29 @@
   color: var(--text-main, #f0eeea);
 }
 
-/* Message */
-.repair-message {
-  padding: 12px 16px;
-  border-radius: 12px;
-  font-family: var(--font-display, 'Syne', sans-serif);
-  font-size: 13px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.repair-message.success {
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.25);
-  color: #4ade80;
-}
-
-.repair-message.error {
-  background: var(--accent-dim, rgba(255,106,0,0.12));
-  border: 1px solid var(--border-accent, rgba(255,106,0,0.35));
-  color: var(--accent, #FF6A00);
-}
-
 /* Submit button */
 .repair-submit-btn {
   width: 100%;
-  height: 54px;
-  border-radius: 16px;
+  height: 56px;
+  border-radius: 18px;
   border: none;
-  background: var(--accent, #FF6A00);
+  background: linear-gradient(135deg, #ff6a00, #ff8533);
   color: white;
-  font-family: var(--font-display, 'Syne', sans-serif);
+  font-family: 'Manrope', sans-serif;
   font-size: 15px;
   font-weight: 800;
   letter-spacing: 0.03em;
   cursor: pointer;
-  transition: all 0.22s ease;
+  transition: all 0.25s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 .repair-submit-btn:hover {
-  box-shadow: 0 8px 28px var(--accent-glow, rgba(255,106,0,0.3));
+  box-shadow: 0 10px 30px rgba(255,106,0,0.35);
   transform: translateY(-2px);
 }
 
@@ -459,6 +443,7 @@
 }
 
 .repair-form-footer p {
+  font-family: 'Manrope', sans-serif;
   font-size: 11px;
   color: var(--text-muted, #6b6b72);
   line-height: 1.5;
@@ -505,16 +490,8 @@
   }
 
   .repair-form-header,
-  .repair-form-body {
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-
-  .repair-form-tabs {
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-
+  .repair-form-body,
+  .repair-form-tabs,
   .repair-form-footer {
     padding-left: 20px;
     padding-right: 20px;
@@ -526,5 +503,9 @@
 
   .repair-trust-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .repair-panel-title {
+    font-size: 34px;
   }
 }
