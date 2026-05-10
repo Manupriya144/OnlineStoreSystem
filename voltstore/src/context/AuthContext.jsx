@@ -26,12 +26,12 @@ export function AuthProvider({ children }) {
     return finalRole;
   }
 
-  async function ensureProfile(currentUser, fullName = "") {
+  async function ensureProfile(currentUser, fullName = "", email = "") {
     if (!currentUser) return;
 
     const { data: existing, error: selectError } = await supabase
       .from("profiles")
-      .select("id")
+      .select("*")
       .eq("id", currentUser.id)
       .maybeSingle();
 
@@ -40,12 +40,47 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    if (existing) return;
+    // UPDATE missing fields if profile already exists
+    if (existing) {
+      const updates = {};
+
+      if (!existing.full_name) {
+        updates.full_name =
+          fullName ||
+          currentUser.user_metadata?.full_name ||
+          currentUser.email;
+      }
+
+      if (!existing.email) {
+        updates.email = email || currentUser.email;
+      }
+
+      if (Object.keys(updates).length > 0) {
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update(updates)
+          .eq("id", currentUser.id);
+
+        if (updateError) {
+          console.log("Profile update error:", updateError.message);
+        }
+      }
+
+      return existing;
+    }
 
     const { error } = await supabase.from("profiles").insert({
       id: currentUser.id,
+
       full_name:
-        fullName || currentUser.user_metadata?.full_name || currentUser.email,
+        fullName ||
+        currentUser.user_metadata?.full_name ||
+        currentUser.email,
+
+      email:
+        email ||
+        currentUser.email,
+
       role: "customer",
     });
 
@@ -124,7 +159,7 @@ export function AuthProvider({ children }) {
     if (error) throw error;
 
     if (data.user) {
-      await ensureProfile(data.user, fullName);
+      await ensureProfile(data.user, fullName, email);
     }
 
     return data;

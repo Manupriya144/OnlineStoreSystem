@@ -79,10 +79,23 @@ function AdminDashboard() {
   async function loadAdminData() {
     setLoading(true);
 
-    const { data: orderData } = await supabase
+    const { data: orderData, error: orderError } = await supabase
       .from("orders")
-      .select(`*, addresses(*), order_items(*)`)
+      .select(`
+        *,
+        addresses(*),
+        order_items(*),
+        profiles(
+          email,
+          full_name
+        )
+      `)
       .order("created_at", { ascending: false });
+
+    if (orderError) {
+      console.error("Order load error:", orderError.message);
+      showToast(orderError.message, "error");
+    }
 
     const { data: repairData } = await supabase
       .from("repair_requests")
@@ -127,13 +140,76 @@ function AdminDashboard() {
   }, [authLoading, role]);
 
   async function updateOrderStatus(orderId, status) {
-    await supabase
-      .from("orders")
-      .update({ order_status: status })
-      .eq("id", orderId);
+    try {
+      const order = orders.find((o) => o.id === orderId);
 
-    showToast("Order status updated", "success");
-    loadAdminData();
+      if (!order) {
+        showToast("Order not found", "error");
+        return;
+      }
+
+      const previousStatus = order.order_status;
+
+      const { error: updateError } = await supabase
+        .from("orders")
+        .update({ order_status: status })
+        .eq("id", orderId);
+
+      if (updateError) {
+        showToast(updateError.message, "error");
+        return;
+      }
+
+      if (status === "confirmed" && previousStatus !== "confirmed") {
+        const customerEmail = order.profiles?.email;
+
+        const customerName =
+          order.profiles?.full_name ||
+          order.addresses?.full_name ||
+          "Customer";
+
+        if (!customerEmail || !customerEmail.includes("@")) {
+          showToast("Order confirmed, but customer email not found", "error");
+          loadAdminData();
+          return;
+        }
+
+        const { error: emailError } = await supabase.functions.invoke(
+          "send-confirmed-order-email",
+          {
+            body: {
+              email: customerEmail,
+              customerName,
+              orderNumber: order.order_number,
+              paymentMethod:
+                order.payment_status === "paid"
+                  ? "Card Payment"
+                  : "Cash on Delivery",
+              paymentStatus:
+                order.payment_status === "paid" ? "Paid" : "Pending",
+              total: order.total_amount,
+            },
+          }
+        );
+
+        if (emailError) {
+          console.error("Confirmation email failed:", emailError);
+          showToast("Order confirmed, but email failed", "error");
+          loadAdminData();
+          return;
+        }
+
+        showToast("Order confirmed and email sent", "success");
+        loadAdminData();
+        return;
+      }
+
+      showToast("Order status updated", "success");
+      loadAdminData();
+    } catch (err) {
+      console.error(err);
+      showToast(err.message || "Failed to update order", "error");
+    }
   }
 
   async function updatePaymentStatus(orderId, status) {
