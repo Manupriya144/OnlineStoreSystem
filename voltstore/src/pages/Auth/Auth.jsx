@@ -22,7 +22,6 @@ function Auth() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    // Detect Supabase recovery link
     const hash = window.location.hash;
 
     if (hash && hash.includes("type=recovery")) {
@@ -30,7 +29,6 @@ function Auth() {
       setMessage("Enter your new password.");
     }
 
-    // Listen for password recovery session
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
@@ -50,13 +48,11 @@ function Auth() {
       setLoading(true);
       setMessage("");
 
-      // LOGIN
       if (mode === "login") {
         await login(email, password);
         navigate("/cart");
       }
 
-      // REGISTER
       if (mode === "register") {
         await register(email, password, fullName);
 
@@ -70,7 +66,6 @@ function Auth() {
         setFullName("");
       }
 
-      // FORGOT PASSWORD
       if (mode === "forgot") {
         const redirectUrl =
           window.location.hostname === "localhost"
@@ -88,7 +83,6 @@ function Auth() {
         );
       }
 
-      // UPDATE PASSWORD
       if (mode === "updatePassword") {
         if (newPassword.length < 6) {
           throw new Error("Password must be at least 6 characters.");
