@@ -15,6 +15,7 @@ function ProductDetails() {
   const [selectedImage, setSelectedImage] = useState("");
   const [qty, setQty] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [zoomStyle, setZoomStyle] = useState({});
 
   useEffect(() => {
     async function loadProduct() {
@@ -43,6 +44,22 @@ function ProductDetails() {
 
     loadProduct();
   }, [slug]);
+
+  function handleImageMove(e) {
+    const rect = e.currentTarget.getBoundingClientRect();
+
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+    setZoomStyle({
+      transform: "scale(1.9)",
+      transformOrigin: `${x}% ${y}%`,
+    });
+  }
+
+  function handleImageLeave() {
+    setZoomStyle({});
+  }
 
   if (loading) {
     return <div className="details-page">Loading product...</div>;
@@ -76,12 +93,18 @@ function ProductDetails() {
 
       <div className="details-layout">
         <div className="gallery">
-          <div className="main-image">
+          <div
+            className="main-image zoomable"
+            onMouseMove={handleImageMove}
+            onMouseLeave={handleImageLeave}
+          >
             {mainImage ? (
-              <img src={mainImage} alt={product.name} />
+              <img src={mainImage} alt={product.name} style={zoomStyle} />
             ) : (
               <span>No Image</span>
             )}
+
+            {mainImage && <div className="zoom-hint">Move cursor to zoom</div>}
           </div>
 
           <div className="thumbnail-row">
@@ -91,7 +114,10 @@ function ProductDetails() {
                 className={
                   selectedImage === img.image_path ? "thumb active" : "thumb"
                 }
-                onClick={() => setSelectedImage(img.image_path)}
+                onClick={() => {
+                  setSelectedImage(img.image_path);
+                  setZoomStyle({});
+                }}
               >
                 <img
                   src={getProductImageUrl(img.image_path)}
