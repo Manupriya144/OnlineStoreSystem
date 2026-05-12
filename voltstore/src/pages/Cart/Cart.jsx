@@ -15,21 +15,8 @@ const EmptyCartIllustration = () => (
     <path d="M30,60 Q30,30 60,30 L160,30" fill="none" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round" />
     <line x1="30" y1="60" x2="38" y2="105" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round" />
     <rect x="38" y="105" width="138" height="60" rx="12" fill="var(--bg-card)" stroke="var(--accent)" strokeWidth="3" />
-    <line x1="38" y1="130" x2="176" y2="130" stroke="var(--accent)" strokeWidth="1" opacity="0.25" />
-    <line x1="38" y1="150" x2="176" y2="150" stroke="var(--accent)" strokeWidth="1" opacity="0.25" />
-    <line x1="84" y1="105" x2="84" y2="165" stroke="var(--accent)" strokeWidth="1" opacity="0.25" />
-    <line x1="130" y1="105" x2="130" y2="165" stroke="var(--accent)" strokeWidth="1" opacity="0.25" />
-    <circle cx="80" cy="122" r="7" fill="var(--accent)" />
-    <circle cx="80" cy="122" r="3" fill="var(--bg-card)" />
-    <circle cx="126" cy="122" r="7" fill="var(--accent)" />
-    <circle cx="126" cy="122" r="3" fill="var(--bg-card)" />
-    <path d="M90,148 Q107,140 124,148" fill="none" stroke="var(--accent)" strokeWidth="3" strokeLinecap="round" />
-    <line x1="176" y1="165" x2="183" y2="182" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round" />
-    <line x1="38" y1="165" x2="31" y2="182" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round" />
     <circle cx="52" cy="186" r="12" fill="var(--bg-card)" stroke="var(--accent)" strokeWidth="3" />
-    <circle cx="52" cy="186" r="5" fill="var(--bg-soft)" stroke="var(--accent)" strokeWidth="2" />
     <circle cx="162" cy="186" r="12" fill="var(--bg-card)" stroke="var(--accent)" strokeWidth="3" />
-    <circle cx="162" cy="186" r="5" fill="var(--bg-soft)" stroke="var(--accent)" strokeWidth="2" />
   </svg>
 );
 
@@ -64,6 +51,7 @@ function Cart() {
           <EmptyCartIllustration />
           <h1>Your cart is empty</h1>
           <p>Add products to your cart and they will appear here.</p>
+
           <Link to="/shop" className="shop-now-btn">
             Shop Now
           </Link>
@@ -77,27 +65,26 @@ function Cart() {
       <div className="cart-header premium-cart-header">
         <div>
           <span className="cart-eyebrow">Tazz Electronics Cart</span>
-          <h1>Your Tech Bag</h1>
+
+          <h1>Your Next Upgrade Awaits</h1>
+
           <p>
-            Review your selected electronics, manage quantities, and continue to
-            a secure checkout experience.
+            Review your selected electronics and complete your order with a
+            smooth, secure checkout experience.
           </p>
         </div>
 
-        <div className="cart-header-stat">
-          <span>{cart.length}</span>
-          <p>{cart.length === 1 ? "Item ready" : "Items ready"}</p>
+        <div className="cart-status-pill">
+          <div className="status-indicator">
+            <span className="status-dot"></span>
+          </div>
+
+          <div className="status-content">
+            <strong>{cart.length}</strong>
+            <span>{cart.length === 1 ? "Item ready" : "Items ready"}</span>
+          </div>
         </div>
       </div>
-
-      {/* <div className="cart-promo-strip">
-        <div className="promo-icon">⚡</div>
-        <div>
-          <span>Premium checkout experience</span>
-          <strong>Fast delivery, secure payments, and warranty support.</strong>
-        </div>
-        <p>Built for a smooth online shopping experience.</p>
-      </div> */}
 
       <div className="cart-layout">
         <div className="cart-items">
@@ -234,6 +221,7 @@ function Cart() {
               <span>Payment Options</span>
               <strong>COD / Online Card</strong>
             </div>
+
             <span className="payment-icon">💳</span>
           </div>
 
