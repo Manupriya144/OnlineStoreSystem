@@ -17,7 +17,7 @@ A modern full-stack electronics e-commerce website built with **React, Vite, Sup
 
 <br/>
 
-[Live Demo](#) • [Features](#-features) • [Installation](#-installation) • [Author](#-author)
+[Live Demo](https://online-store-system-nine.vercel.app/) • [Features](#-features) • [Installation](#-installation) • [Author](https://github.com/Mohamed-Irfan-git)
 
 </div>
 
