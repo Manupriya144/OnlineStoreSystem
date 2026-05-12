@@ -8,6 +8,7 @@ export default defineConfig({
 
     VitePWA({
       registerType: "autoUpdate",
+      injectRegister: "auto",
 
       includeAssets: [
         "favicon.ico",
@@ -15,13 +16,16 @@ export default defineConfig({
       ],
 
       manifest: {
+        id: "/",
         name: "Tazz Electronics",
         short_name: "Tazz",
         description: "Premium electronics shopping experience",
         theme_color: "#0b0b0b",
         background_color: "#0b0b0b",
+
         display: "standalone",
         orientation: "portrait",
+
         scope: "/",
         start_url: "/",
 
