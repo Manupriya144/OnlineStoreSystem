@@ -28,6 +28,7 @@ export default defineConfig({
 
         scope: "/",
         start_url: "/",
+        prefer_related_applications: false,
 
         icons: [
           {
