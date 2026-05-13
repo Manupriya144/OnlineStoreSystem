@@ -18,56 +18,54 @@ const STATUS_LABEL = {
 
 const DELIVERY_STEPS = ["confirmed", "shipped", "delivered"];
 
-function CheckIcon() {
-  return (
-    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-      <path
-        d="M2 5l2.5 2.5L8 3"
-        stroke="white"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
+const STEP_META = {
+  confirmed: { icon: "✓", label: "Confirmed",  sub: "Order accepted" },
+  shipped:   { icon: "→", label: "Shipped",    sub: "On the way"     },
+  delivered: { icon: "★", label: "Delivered",  sub: "Handed over"    },
+};
 
 function ChevronIcon({ open }) {
   return (
     <svg
       className={`chevron-icon${open ? " open" : ""}`}
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
+      width="16" height="16" viewBox="0 0 16 16" fill="none"
     >
-      <path
-        d="M4 6l4 4 4-4"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.8"
+        strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
 function ProgressTracker({ status }) {
   const activeIdx = DELIVERY_STEPS.indexOf(status);
+
   return (
     <div className="tracker-row">
-      <p className="sec-label">Delivery status</p>
+      <p className="sec-label">Delivery Progress</p>
       <div className="tracker">
         {DELIVERY_STEPS.map((step, i) => {
-          const done = i <= activeIdx;
+          const done   = i <= activeIdx;
+          const active = i === activeIdx;
+          const meta   = STEP_META[step];
+
           return (
-            <div
-              key={step}
-              className={`t-step${done ? " done" : ""}${i === activeIdx ? " active" : ""}`}
-            >
-              <div className="t-dot">{done && <CheckIcon />}</div>
-              {i < DELIVERY_STEPS.length - 1 && <div className="t-line" />}
-              <span>{step.charAt(0).toUpperCase() + step.slice(1)}</span>
+            <div key={step} className={`t-step${done ? " done" : ""}${active ? " active" : ""}`}>
+              {/* connector line before (except first) */}
+              {i > 0 && (
+                <div className={`t-line-before${done ? " done" : ""}`} />
+              )}
+
+              <div className="t-dot-wrap">
+                <div className="t-dot">
+                  {done ? <span className="t-check">{meta.icon}</span> : <span className="t-idx">{i + 1}</span>}
+                </div>
+                {active && <div className="t-pulse" />}
+              </div>
+
+              <div className="t-labels">
+                <span className="t-name">{meta.label}</span>
+                <span className="t-sub">{meta.sub}</span>
+              </div>
             </div>
           );
         })}
@@ -79,37 +77,32 @@ function ProgressTracker({ status }) {
 function OrderCard({ order, defaultOpen }) {
   const [open, setOpen] = useState(defaultOpen);
   const showTracker = DELIVERY_STEPS.includes(order.order_status);
+  const itemCount   = order.order_items?.length ?? 0;
 
   return (
     <div className={`order-card${open ? " open" : ""}`}>
 
-      {/* ── Always-visible header ── */}
-      <button
-        className="card-header"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-      >
-        {/* Stacked thumbnails */}
+      {/* ── Header ── */}
+      <button className="card-header" onClick={() => setOpen(v => !v)} aria-expanded={open}>
+
+        {/* Thumb stack */}
         <div className="thumb-stack">
           {order.order_items?.slice(0, 3).map((item) => {
             const primary =
-              item.product?.product_images?.find((img) => img.is_primary) ||
+              item.product?.product_images?.find(img => img.is_primary) ||
               item.product?.product_images?.[0];
             const url = primary ? getProductImageUrl(primary.image_path) : null;
             return (
               <div className="thumb" key={item.id}>
-                {url ? (
-                  <img src={url} alt={item.product_name} />
-                ) : (
-                  <span>{item.product_name?.[0]?.toUpperCase() ?? "?"}</span>
-                )}
+                {url
+                  ? <img src={url} alt={item.product_name} />
+                  : <span>{item.product_name?.[0]?.toUpperCase() ?? "?"}</span>
+                }
               </div>
             );
           })}
-          {order.order_items?.length > 3 && (
-            <div className="thumb thumb-more">
-              +{order.order_items.length - 3}
-            </div>
+          {itemCount > 3 && (
+            <div className="thumb thumb-more">+{itemCount - 3}</div>
           )}
         </div>
 
@@ -117,19 +110,19 @@ function OrderCard({ order, defaultOpen }) {
         <div className="card-meta">
           <div className="meta-top">
             <span className="order-num">{order.order_number}</span>
+            <span className="meta-dot" />
             <span className="order-date">
               {new Date(order.created_at).toLocaleDateString("en-LK", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
+                year: "numeric", month: "short", day: "numeric",
               })}
             </span>
+            <span className="item-count-tag">{itemCount} item{itemCount !== 1 ? "s" : ""}</span>
           </div>
           <div className="pills">
-            <span className={`pill ${order.order_status}`}>
+            <span className={`pill status-${order.order_status}`}>
               {STATUS_LABEL[order.order_status] ?? order.order_status}
             </span>
-            <span className={`pill ${order.payment_status}`}>
+            <span className={`pill pay-${order.payment_status}`}>
               {STATUS_LABEL[order.payment_status] ?? order.payment_status}
             </span>
           </div>
@@ -137,66 +130,70 @@ function OrderCard({ order, defaultOpen }) {
 
         {/* Total + toggle */}
         <div className="card-right">
-          <strong className="header-total">{formatLKR(order.total_amount)}</strong>
-          <ChevronIcon open={open} />
+          <div className="total-block">
+            <span className="total-label">Total</span>
+            <strong className="header-total">{formatLKR(order.total_amount)}</strong>
+          </div>
+          <div className={`chevron-wrap${open ? " open" : ""}`}>
+            <ChevronIcon open={open} />
+          </div>
         </div>
       </button>
 
-      {/* ── Expandable body ── */}
+      {/* ── Body ── */}
       <div className="card-body">
         <div className="card-body-inner">
           <div className="card-body-content">
 
+            {/* Tracker */}
             {showTracker && <ProgressTracker status={order.order_status} />}
 
             {/* Items */}
             <div className="items-section">
               <p className="sec-label">
-                Items ordered
-                <span className="sec-count">{order.order_items?.length}</span>
+                Items Ordered
+                <span className="sec-count">{itemCount}</span>
               </p>
               <div className="items-list">
                 {order.order_items?.map((item) => {
                   const primary =
-                    item.product?.product_images?.find((img) => img.is_primary) ||
+                    item.product?.product_images?.find(img => img.is_primary) ||
                     item.product?.product_images?.[0];
                   const url = primary ? getProductImageUrl(primary.image_path) : null;
                   return (
                     <div className="item-row" key={item.id}>
                       <div className="item-img">
-                        {url ? (
-                          <img src={url} alt={item.product_name} />
-                        ) : (
-                          <span>{item.product_name?.[0]?.toUpperCase()}</span>
-                        )}
+                        {url
+                          ? <img src={url} alt={item.product_name} />
+                          : <span>{item.product_name?.[0]?.toUpperCase()}</span>
+                        }
                       </div>
                       <div className="item-info">
                         <span className="item-name">{item.product_name}</span>
-                        <span className="item-qty">Qty {item.quantity}</span>
+                        <span className="item-qty">Qty · {item.quantity}</span>
                       </div>
-                      <strong className="item-price">{formatLKR(item.line_total)}</strong>
+                      <div className="item-price-col">
+                        <strong className="item-price">{formatLKR(item.line_total)}</strong>
+                        {item.quantity > 1 && (
+                          <span className="item-unit">{formatLKR(item.line_total / item.quantity)} each</span>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
               </div>
             </div>
 
-            {/* Address + Summary */}
+            {/* Footer */}
             <div className="footer-grid">
               <div className="footer-section">
-                <p className="sec-label">Delivery address</p>
+                <p className="sec-label">Delivery Address</p>
                 {order.addresses ? (
                   <address className="addr-block">
                     <span className="addr-name">{order.addresses.full_name}</span>
-                    <span>{order.addresses.phone}</span>
-                    <span>
-                      {order.addresses.line1}
-                      {order.addresses.line2 ? `, ${order.addresses.line2}` : ""}
-                    </span>
-                    <span>
-                      {order.addresses.city}
-                      {order.addresses.district ? `, ${order.addresses.district}` : ""}
-                    </span>
+                    <span className="addr-phone">{order.addresses.phone}</span>
+                    <span>{order.addresses.line1}{order.addresses.line2 ? `, ${order.addresses.line2}` : ""}</span>
+                    <span>{order.addresses.city}{order.addresses.district ? `, ${order.addresses.district}` : ""}</span>
                   </address>
                 ) : (
                   <p className="no-data">No address on file</p>
@@ -204,7 +201,7 @@ function OrderCard({ order, defaultOpen }) {
               </div>
 
               <div className="footer-section">
-                <p className="sec-label">Order summary</p>
+                <p className="sec-label">Order Summary</p>
                 <div className="summary-card">
                   <div className="sum-row">
                     <span>Subtotal</span>
@@ -212,9 +209,7 @@ function OrderCard({ order, defaultOpen }) {
                   </div>
                   <div className="sum-row">
                     <span>Delivery</span>
-                    <span>
-                      {order.delivery_fee === 0 ? "Free" : formatLKR(order.delivery_fee)}
-                    </span>
+                    <span>{order.delivery_fee === 0 ? "Free" : formatLKR(order.delivery_fee)}</span>
                   </div>
                   <div className="sum-row sum-total">
                     <span>Total</span>
@@ -231,29 +226,21 @@ function OrderCard({ order, defaultOpen }) {
   );
 }
 
+/* ── Empty illustration ── */
 const EmptyIllustration = () => (
-  <svg
-    className="empty-svg"
-    viewBox="0 0 200 200"
-    xmlns="http://www.w3.org/2000/svg"
-    aria-hidden="true"
-  >
-    <rect x="30" y="80" width="140" height="100" rx="14" fill="var(--bg-card)" stroke="var(--accent)" strokeWidth="3" />
-    <path d="M22,80 L178,80 L160,50 L40,50 Z" fill="var(--bg-soft)" stroke="var(--accent)" strokeWidth="3" strokeLinejoin="round" />
-    <line x1="40" y1="50" x2="30" y2="80" stroke="var(--accent)" strokeWidth="1.5" opacity="0.4" />
-    <line x1="160" y1="50" x2="178" y2="80" stroke="var(--accent)" strokeWidth="1.5" opacity="0.4" />
-    <rect x="85" y="48" width="30" height="34" rx="4" fill="var(--accent)" opacity="0.18" stroke="var(--accent)" strokeWidth="1.5" />
-    <rect x="85" y="80" width="30" height="40" fill="var(--accent)" opacity="0.12" stroke="var(--accent)" strokeWidth="1.5" />
-    <circle cx="80" cy="130" r="7" fill="var(--accent)" />
+  <svg className="empty-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect x="30" y="80" width="140" height="100" rx="14" fill="var(--bg-card)" stroke="var(--acc)" strokeWidth="3" />
+    <path d="M22,80 L178,80 L160,50 L40,50 Z" fill="var(--bg-soft)" stroke="var(--acc)" strokeWidth="3" strokeLinejoin="round" />
+    <rect x="85" y="80" width="30" height="40" fill="var(--acc)" opacity="0.12" stroke="var(--acc)" strokeWidth="1.5" />
+    <circle cx="80" cy="130" r="7" fill="var(--acc)" />
     <circle cx="80" cy="130" r="3" fill="var(--bg-card)" />
-    <circle cx="120" cy="130" r="7" fill="var(--accent)" />
+    <circle cx="120" cy="130" r="7" fill="var(--acc)" />
     <circle cx="120" cy="130" r="3" fill="var(--bg-card)" />
-    <path d="M88,155 Q100,147 112,155" fill="none" stroke="var(--accent)" strokeWidth="3" strokeLinecap="round" />
-    <circle cx="14" cy="70" r="3" fill="var(--accent)" opacity="0.35" />
-    <circle cx="186" cy="85" r="4" fill="var(--accent)" opacity="0.28" />
+    <path d="M88,155 Q100,147 112,155" fill="none" stroke="var(--acc)" strokeWidth="3" strokeLinecap="round" />
   </svg>
 );
 
+/* ── Page ── */
 export default function Orders() {
   const navigate = useNavigate();
   const { user, authLoading } = useAuth();
@@ -297,7 +284,7 @@ export default function Orders() {
     return (
       <section className="orders-page">
         <div className="skeleton-wrap">
-          {[92, 76, 92].map((h, i) => (
+          {[78, 92, 78].map((h, i) => (
             <div key={i} className="skeleton-card" style={{ height: h }} />
           ))}
         </div>
@@ -310,9 +297,11 @@ export default function Orders() {
       <section className="orders-page">
         <div className="empty-state">
           <EmptyIllustration />
-          <h1>No orders yet</h1>
-          <p>Your completed orders will appear here.</p>
-          <Link to="/shop" className="shop-btn">Start Shopping</Link>
+          <div className="empty-text">
+            <h1>No orders yet</h1>
+            <p>Your completed purchases will appear here.</p>
+          </div>
+          <Link to="/shop" className="shop-btn">Browse Collection</Link>
         </div>
       </section>
     );
@@ -330,7 +319,11 @@ export default function Orders() {
 
       <div className="orders-list">
         {orders.map((order, idx) => (
-          <OrderCard key={order.id} order={order} defaultOpen={idx === 0} />
+          <OrderCard
+            key={order.id}
+            order={order}
+            defaultOpen={idx === 0}
+          />
         ))}
       </div>
     </section>

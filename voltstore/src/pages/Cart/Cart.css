@@ -36,7 +36,7 @@
 
 .cart-header h1 {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(42px, 5vw, 68px);
+  font-size: clamp(42px, 5vw, 40px);
   font-weight: 800;
   letter-spacing: -0.05em;
   color: var(--text-main, #f5f5f7);
@@ -222,7 +222,7 @@
 }
 
 .cart-info h3 {
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1.28;
   font-weight: 900;
   letter-spacing: -0.025em;
@@ -345,6 +345,7 @@
 }
 
 .summary-top h2 {
+  font-family: 'Playfair Display';
   margin-top: 5px;
   font-size: 26px;
   font-weight: 900;
