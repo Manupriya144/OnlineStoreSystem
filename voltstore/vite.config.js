@@ -12,17 +12,28 @@ export default defineConfig({
 
       manifest: {
         id: "/",
+
         name: "Tazz Electronics",
         short_name: "Tazz",
+
         description: "Premium electronics shopping experience",
 
         theme_color: "#0b0b0b",
         background_color: "#0b0b0b",
 
-        display: "standalone",
+        display: "fullscreen",
+        display_override: [
+          "fullscreen",
+          "standalone",
+          "minimal-ui"
+        ],
+
+        orientation: "portrait",
+
         scope: "/",
         start_url: "/",
-        orientation: "portrait",
+
+        prefer_related_applications: false,
 
         icons: [
           {
@@ -30,16 +41,18 @@ export default defineConfig({
             sizes: "192x192",
             type: "image/png",
           },
+
           {
             src: "/icons/icon-512.png",
             sizes: "512x512",
             type: "image/png",
           },
+
           {
             src: "/icons/icon-512-maskable.png",
             sizes: "512x512",
             type: "image/png",
-            purpose: "maskable",
+            purpose: "any maskable",
           },
         ],
       },
