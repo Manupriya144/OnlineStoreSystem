@@ -21,9 +21,8 @@ export default defineConfig({
         theme_color: "#0b0b0b",
         background_color: "#0b0b0b",
 
-        display: "fullscreen",
+        display: "standalone",
         display_override: [
-          "fullscreen",
           "standalone",
           "minimal-ui"
         ],
