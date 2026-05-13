@@ -408,7 +408,7 @@ function AdminDashboard() {
   }
 
   if (loading) return <div className="admin-loading">Loading dashboard…</div>;
-  // admin
+  // admin dashboard
   return (
     <section className="admin-shell">
       {toast.text && (
