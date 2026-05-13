@@ -1,29 +1,48 @@
-VitePWA({
-  registerType: "autoUpdate",
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { VitePWA } from "vite-plugin-pwa";
 
-  manifest: {
-    name: "Tazz Electronics",
-    short_name: "Tazz",
-    description: "Premium electronics shopping experience",
+export default defineConfig({
+  plugins: [
+    react(),
 
-    theme_color: "#0b0b0b",
-    background_color: "#0b0b0b",
+    VitePWA({
+      registerType: "autoUpdate",
+      injectRegister: "auto",
 
-    display: "standalone",
-    start_url: "/",
+      manifest: {
+        id: "/",
+        name: "Tazz Electronics",
+        short_name: "Tazz",
+        description: "Premium electronics shopping experience",
 
-    icons: [
-      {
-        src: "/icons/icon-192.png",
-        sizes: "192x192",
-        type: "image/png",
+        theme_color: "#0b0b0b",
+        background_color: "#0b0b0b",
+
+        display: "standalone",
+        scope: "/",
+        start_url: "/",
+        orientation: "portrait",
+
+        icons: [
+          {
+            src: "/icons/icon-192.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "/icons/icon-512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+          {
+            src: "/icons/icon-512-maskable.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
+          },
+        ],
       },
-
-      {
-        src: "/icons/icon-512.png",
-        sizes: "512x512",
-        type: "image/png",
-      }
-    ],
-  },
-})
+    }),
+  ],
+});
