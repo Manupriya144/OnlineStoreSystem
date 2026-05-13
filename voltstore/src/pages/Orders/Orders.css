@@ -717,3 +717,174 @@
   .meta-dot     { display: none; }
   .item-count-tag { display: none; }
 }
+
+
+/* ─── Compact mobile order cards ─────────────────── */
+@media (max-width: 600px) {
+  .orders-page {
+    padding: 28px 12px 60px;
+  }
+
+  .page-header {
+    margin-bottom: 22px;
+  }
+
+  .page-header h1 {
+    font-size: 34px;
+  }
+
+  .page-header > p {
+    font-size: 12.5px;
+  }
+
+  .orders-list {
+    gap: 8px;
+  }
+
+  .order-card {
+    border-radius: 16px;
+  }
+
+  .card-header {
+    padding: 12px;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .thumb-stack {
+    max-width: 78px;
+  }
+
+  .thumb {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    margin-left: -9px;
+    font-size: 11px;
+  }
+
+  .thumb:first-child {
+    margin-left: 0;
+  }
+
+  .meta-top {
+    margin-bottom: 5px;
+    gap: 5px;
+  }
+
+  .order-num {
+    font-size: 12px;
+    max-width: 118px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .order-date {
+    font-size: 10.5px;
+  }
+
+  .pills {
+    gap: 4px;
+  }
+
+  .pill {
+    padding: 3px 8px;
+    font-size: 9.5px;
+  }
+
+  .card-right {
+    gap: 8px;
+  }
+
+  .total-block {
+    align-items: flex-end;
+  }
+
+  .header-total {
+    font-size: 12px;
+  }
+
+  .chevron-wrap {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+  }
+
+  .tracker-row {
+    padding: 14px 12px;
+  }
+
+  .t-dot {
+    width: 22px;
+    height: 22px;
+  }
+
+  .t-line-before {
+    top: 10px;
+  }
+
+  .t-name {
+    font-size: 9.5px;
+  }
+
+  .items-section {
+    padding: 12px;
+  }
+
+  .sec-label {
+    margin-bottom: 8px;
+    font-size: 9px;
+  }
+
+  .items-list {
+    gap: 5px;
+  }
+
+  .item-row {
+    padding: 8px;
+    gap: 8px;
+    border-radius: 12px;
+  }
+
+  .item-img {
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    font-size: 14px;
+  }
+
+  .item-name {
+    font-size: 11.5px;
+  }
+
+  .item-qty {
+    font-size: 10px;
+  }
+
+  .item-price {
+    font-size: 11.5px;
+  }
+
+  .item-unit {
+    display: none;
+  }
+
+  .footer-section {
+    padding: 12px;
+  }
+
+  .summary-card {
+    padding: 10px 12px;
+    border-radius: 12px;
+  }
+
+  .sum-row {
+    padding: 4px 0;
+    font-size: 11.5px;
+  }
+
+  .sum-total strong {
+    font-size: 14px;
+  }
+}
