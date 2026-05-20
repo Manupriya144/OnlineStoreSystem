@@ -4,7 +4,7 @@ create table profiles (
   phone text,
   role text not null default 'customer',
   created_at timestamptz default now()
-email text
+  email text
 );
 
 create table categories (
